@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "edu.wm.cs420.juicebox"
         minSdkVersion 26
@@ -18,8 +19,16 @@ android {
     }
 }
 
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
+}
+
 dependencies {
     compile 'com.android.support:design:26.1.0'
+    compile 'com.spotify.android:auth:1.0.0-alpha'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
