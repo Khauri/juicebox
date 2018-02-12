@@ -37,7 +37,7 @@ public class MainActivity
 
     private static final String CLIENT_ID = "6098304025324b66af007d562d58830e";
     // TODO: Replace with your redirect URI
-    private static final String REDIRECT_URI = "yourcustomprotocol://callback";
+    private static final String REDIRECT_URI = "juicebox.redirect.uri://callback/";
 
     private ViewPager mPager;
     private MyAdapter mAdapter;
@@ -103,6 +103,7 @@ public class MainActivity
         // The next 19 lines of the code are what you need to copy & paste! :)
         if (requestCode == REQUEST_CODE) {
             AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
+            Log.d("Juicebox", response.getError() + "  ");
             if (response.getType() == AuthenticationResponse.Type.TOKEN) {
                 Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
                 Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
@@ -158,7 +159,7 @@ public class MainActivity
 
     @Override
     public void onLoginFailed(Error error) {
-
+        Log.d("jukebox", "Authentification error " + error.toString());
     }
 
     @Override

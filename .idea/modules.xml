@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/juicebox.iml" filepath="$PROJECT_DIR$/juicebox.iml" />
       <module fileurl="file://$PROJECT_DIR$/spotify-player-24-noconnect-2.20b/spotify-player-24-noconnect-2.20b.iml" filepath="$PROJECT_DIR$/spotify-player-24-noconnect-2.20b/spotify-player-24-noconnect-2.20b.iml" />
+      <module fileurl="file://C:\Users\Khauri\Documents\juicebox\spotify-player-24-noconnect-2.20b\spotify-player-24-noconnect-2.20b.iml" filepath="C:\Users\Khauri\Documents\juicebox\spotify-player-24-noconnect-2.20b\spotify-player-24-noconnect-2.20b.iml" />
     </modules>
   </component>
 </project>
