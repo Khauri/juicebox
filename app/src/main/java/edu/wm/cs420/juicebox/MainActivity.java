@@ -26,6 +26,18 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
+import kaaes.spotify.webapi.android.SpotifyApi;
+import kaaes.spotify.webapi.android.SpotifyService;
+import kaaes.spotify.webapi.android.models.Album;
+import retrofit.Callback;
+import retrofit.RequestInterceptor;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+
+import static android.bluetooth.BluetoothDevice.ERROR;
+import static com.spotify.sdk.android.authentication.AuthenticationResponse.Type.TOKEN;
+
 public class MainActivity
         extends AppCompatActivity
         implements QueueFragment.OnFragmentInteractionListener,
@@ -45,13 +57,14 @@ public class MainActivity
     // Spotify stuff
     private static final int REQUEST_CODE = 1337;
     private Player mPlayer;
+    private String accessToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // Authentifications
-        AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
+        AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, TOKEN, REDIRECT_URI);
         builder.setScopes(new String[]{"user-read-private", "streaming"});
         AuthenticationRequest request = builder.build();
 
@@ -94,33 +107,85 @@ public class MainActivity
         mPager.setCurrentItem(1);
     }
 
+    public void getAlbum(){
+        SpotifyApi api = new SpotifyApi();
+
+// Most (but not all) of the Spotify Web API endpoints require authorisation.
+// If you know you'll only use the ones that don't require authorisation you can skip this step
+        api.setAccessToken("myAccessToken");
+
+        SpotifyService spotify = api.getService();
+
+        spotify.getAlbum("2dIGnmEIy1WZIcZCFSj6i8", new Callback<Album>() {
+            @Override
+            public void success(Album album, Response response) {
+                Log.d("Album success", album.name);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d("Album failure", error.toString());
+            }
+        });
+    }
+
+    public String getAccessToken(){
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint(SpotifyApi.SPOTIFY_WEB_API_ENDPOINT)
+                .setRequestInterceptor(new RequestInterceptor() {
+                    @Override
+                    public void intercept(RequestFacade request) {
+                        request.addHeader("Authorization", "Bearer " + accessToken);
+                    }
+                })
+                .build();
+
+        SpotifyService spotify = restAdapter.create(SpotifyService.class);
+        return accessToken;
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         Log.d("Juicebox", "Recieved activity result");
-
         // Check if result comes from the correct activity
         // The next 19 lines of the code are what you need to copy & paste! :)
         if (requestCode == REQUEST_CODE) {
             AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
             Log.d("Juicebox", response.getError() + "  ");
-            if (response.getType() == AuthenticationResponse.Type.TOKEN) {
-                Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
-                Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
-                    @Override
-                    public void onInitialized(SpotifyPlayer spotifyPlayer) {
-                        mPlayer = spotifyPlayer;
-                        mPlayer.addConnectionStateCallback(MainActivity.this);
-                        mPlayer.addNotificationCallback(MainActivity.this);
-                    }
+            switch (response.getType()) {
+                // Response was successful and contains auth token
+                case TOKEN:
+                    Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
+                    accessToken = response.getCode();
+                    Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
+                        @Override
+                        public void onInitialized(SpotifyPlayer spotifyPlayer) {
+                            mPlayer = spotifyPlayer;
+                            mPlayer.addConnectionStateCallback(MainActivity.this);
+                            mPlayer.addNotificationCallback(MainActivity.this);
+                        }
 
-                    @Override
-                    public void onError(Throwable throwable) {
-                        Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
-                    }
-                });
+                        @Override
+                        public void onError(Throwable throwable) {
+                            Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
+                        }
+                    });
+                    break;
+
+                // Auth flow returned an error
+                case ERROR:
+                    Log.d("Error", "Error");
+                    // Handle error response
+                    break;
+
+                // Most likely auth flow was cancelled
+                default:
+                    // Handle other cases
             }
+
         }
+
     }
 
     private boolean loadFragment(int id){
