@@ -27,6 +27,7 @@ android {
 
 repositories {
     mavenCentral()
+    maven { url "https://jitpack.io" }
     flatDir {
         dirs 'libs'
     }
@@ -44,4 +45,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation project(':spotify-player-24-noconnect-2.20b')
+    compile 'com.github.kaaes:spotify-web-api-android:0.4.1'
 }

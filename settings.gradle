@@ -1,1 +1,1 @@
-include ':app', ':spotify-player-24-noconnect-2.20b'
+include ':app', ':spotify-player-24-noconnect-2.20b', ':spotify-web-api-android-0.4.1'
