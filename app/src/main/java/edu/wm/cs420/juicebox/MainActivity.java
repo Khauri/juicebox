@@ -29,6 +29,8 @@ import android.view.MenuItem;
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Album;
+import kaaes.spotify.webapi.android.models.Pager;
+import kaaes.spotify.webapi.android.models.PlaylistSimple;
 import retrofit.Callback;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
@@ -44,6 +46,8 @@ public class MainActivity
         SearchFragment.OnFragmentInteractionListener,
         SocialFragment.OnFragmentInteractionListener,
         SpotifyPlayer.NotificationCallback, ConnectionStateCallback {
+
+    private String TAG = "MainActivity";
 
     private static final int NUM_ITEMS = 3;
 
@@ -108,13 +112,27 @@ public class MainActivity
     }
 
     public void getAlbum(){
+        Log.d(TAG, "getAlbum: Getting Album");
         SpotifyApi api = new SpotifyApi();
 
 // Most (but not all) of the Spotify Web API endpoints require authorisation.
 // If you know you'll only use the ones that don't require authorisation you can skip this step
-        api.setAccessToken("myAccessToken");
+        String accToken = getAccessToken();
+        api.setAccessToken(accToken);
 
         SpotifyService spotify = api.getService();
+        spotify.getMyPlaylists(new Callback<Pager<PlaylistSimple>>() {
+            @Override
+            public void success(Pager<PlaylistSimple> playlistSimplePager, Response response) {
+                Log.d(TAG, playlistSimplePager.toString());
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+
+            }
+        });
+//        Log.d("playlist", playlist.toString());
 
         spotify.getAlbum("2dIGnmEIy1WZIcZCFSj6i8", new Callback<Album>() {
             @Override
@@ -141,6 +159,7 @@ public class MainActivity
                 .build();
 
         SpotifyService spotify = restAdapter.create(SpotifyService.class);
+        Log.d(TAG, "getAccessToken: " + accessToken);
         return accessToken;
     }
 
@@ -157,7 +176,7 @@ public class MainActivity
                 // Response was successful and contains auth token
                 case TOKEN:
                     Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
-                    accessToken = response.getCode();
+                    accessToken = response.getAccessToken();
                     Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
                         @Override
                         public void onInitialized(SpotifyPlayer spotifyPlayer) {
@@ -215,6 +234,7 @@ public class MainActivity
     @Override
     public void onLoggedIn() {
         mPlayer.playUri(null, "spotify:track:2TpxZ7JUBn3uw46aR7qd6V", 0, 0);
+        getAlbum();
     }
 
     @Override
