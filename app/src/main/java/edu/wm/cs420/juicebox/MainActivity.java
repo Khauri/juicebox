@@ -66,15 +66,8 @@ public class MainActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        accessToken = getIntent().getStringExtra("token");
         setContentView(R.layout.activity_main);
-        // Authentifications
-        AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, TOKEN, REDIRECT_URI);
-        builder.setScopes(new String[]{"user-read-private", "streaming"});
-        AuthenticationRequest request = builder.build();
-
-        AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
-
-
 
         // set up adapter and view pager
         mAdapter = new MyAdapter(getSupportFragmentManager());
