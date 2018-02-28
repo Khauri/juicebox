@@ -53,7 +53,7 @@ import java.util.List;
  * a list of scopes and can choose to approve or reject them.</p>
  *
  * <p>If Spotify is not installed on the device, SDK will open a dialog and load Spotify Accounts Service
- * into a WebView. User will have to enter their username and password to login to Spotify.
+ * into a WebView. JuiceboxUser will have to enter their username and password to login to Spotify.
  * They will also need to approve any scopes the the SDK application requests and that they
  * haven't approved before.</p>
  *

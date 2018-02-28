@@ -92,7 +92,7 @@ public class EntryActivity extends AppCompatActivity
 
     @Override
     public void onLoggedOut() {
-        Log.d(TAG, "onLoggedOut: User Logged Out");
+        Log.d(TAG, "onLoggedOut: JuiceboxUser Logged Out");
     }
 
     @Override

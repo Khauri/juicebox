@@ -21,6 +21,7 @@ import com.spotify.sdk.android.player.SpotifyPlayer;
 import java.util.List;
 import java.util.function.Consumer;
 
+import edu.wm.cs420.juicebox.database.DatabaseUtils;
 import kaaes.spotify.webapi.android.models.Pager;
 import kaaes.spotify.webapi.android.models.PlaylistSimple;
 import retrofit.Callback;
@@ -94,6 +95,7 @@ public class MainActivity
 
         //
         getAlbum();
+        DatabaseUtils.createParty();
     }
 
     public void getAlbum(){
