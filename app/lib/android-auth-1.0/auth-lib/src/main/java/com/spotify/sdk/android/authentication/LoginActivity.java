@@ -124,7 +124,7 @@ public class LoginActivity extends Activity implements AuthenticationClient.Auth
     @Override
     protected void onResume() {
         super.onResume();
-        // User got back to the activity from the auth flow
+        // JuiceboxUser got back to the activity from the auth flow
         if (mBackgrounded) {
             mBackgrounded = false;
             onClientCancelled();
