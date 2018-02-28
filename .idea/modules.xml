@@ -5,8 +5,6 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/juicebox.iml" filepath="$PROJECT_DIR$/juicebox.iml" />
       <module fileurl="file://$PROJECT_DIR$/spotify-player-24-noconnect-2.20b/spotify-player-24-noconnect-2.20b.iml" filepath="$PROJECT_DIR$/spotify-player-24-noconnect-2.20b/spotify-player-24-noconnect-2.20b.iml" />
-      <module fileurl="file://C:\Users\Khauri\Documents\juicebox\spotify-player-24-noconnect-2.20b\spotify-player-24-noconnect-2.20b.iml" filepath="C:\Users\Khauri\Documents\juicebox\spotify-player-24-noconnect-2.20b\spotify-player-24-noconnect-2.20b.iml" />
-      <module fileurl="file://$PROJECT_DIR$/spotify-web-api-android-0.4.1/spotify-web-api-android-0.4.1.iml" filepath="$PROJECT_DIR$/spotify-web-api-android-0.4.1/spotify-web-api-android-0.4.1.iml" />
       <module fileurl="file://$PROJECT_DIR$/spotify-web-api-android-0.4.1/spotify-web-api-android-0.4.1.iml" filepath="$PROJECT_DIR$/spotify-web-api-android-0.4.1/spotify-web-api-android-0.4.1.iml" />
     </modules>
   </component>

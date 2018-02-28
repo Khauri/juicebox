@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1007053796011",
+    "firebase_url": "https://juicebox-e1be3.firebaseio.com",
+    "project_id": "juicebox-e1be3",
+    "storage_bucket": "juicebox-e1be3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1007053796011:android:8e78777777d53c90",
+        "android_client_info": {
+          "package_name": "edu.wm.cs420.juicebox"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1007053796011-mqoqrcgsnsuf5ck0r6c5od7tr87pif45.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.wm.cs420.juicebox",
+            "certificate_hash": "fd6851796a2e5190db6d0a2682eb6ff0e3a8044b"
+          }
+        },
+        {
+          "client_id": "1007053796011-ss0qv6g7qnjb0kmg6vr5h3a7htqq43lr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4uJ35TVfrBJ2rSdWKGoRbUDEP-IGGfGc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1007053796011-ss0qv6g7qnjb0kmg6vr5h3a7htqq43lr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
