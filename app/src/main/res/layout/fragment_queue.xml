@@ -5,11 +5,27 @@
     android:background="?attr/colorPrimaryDark"
     tools:context="edu.wm.cs420.juicebox.QueueFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="QUEUE FRAGMENT"
-        android:textColor="@android:color/white" />
+        android:orientation="vertical"
+        android:weightSum="1">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="QUEUE FRAGMENT"
+            android:textColor="@android:color/white"
+            android:layout_weight="0.95"/>
+
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
 
 </FrameLayout>

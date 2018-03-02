@@ -1,5 +1,6 @@
 package edu.wm.cs420.juicebox;
 
+import android.support.v4.app.ListFragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -7,6 +8,12 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -17,7 +24,7 @@ import android.view.ViewGroup;
  * Use the {@link QueueFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class QueueFragment extends Fragment {
+public class QueueFragment extends ListFragment implements AdapterView.OnItemClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -28,6 +35,12 @@ public class QueueFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    private List<SongListItem> songList;
+
+    private ListView lv;
+
+    private QueueAdapter adapter;
 
     public QueueFragment() {
         // Required empty public constructor
@@ -54,17 +67,21 @@ public class QueueFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        songList = new ArrayList();
+        songList.add(new SongListItem("song 1", "album 1", "artist 1", 500));
+        songList.add(new SongListItem("song 2", "album 2", "artist 2", 500));
+        songList.add(new SongListItem("song 3", "album 3", "artist 3", 500));
+        adapter = new QueueAdapter(getActivity(), songList);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_queue, container, false);
+        View view = inflater.inflate(R.layout.fragment_queue, container, false);
+        setListAdapter(adapter);
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -104,5 +121,11 @@ public class QueueFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+        SongListItem item = this.songList.get(position);
+        Toast.makeText(getActivity(), item.getName() + " Clicked!", Toast.LENGTH_SHORT).show();
     }
 }

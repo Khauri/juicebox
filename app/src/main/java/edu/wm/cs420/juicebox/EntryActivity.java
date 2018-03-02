@@ -48,8 +48,9 @@ public class EntryActivity extends AppCompatActivity
         builder.setScopes(new String[]{"user-read-private", "user-library-read", "user-top-read",
                 "playlist-read-private", "user-read-recently-played", "streaming"});
         AuthenticationRequest request = builder.build();
-
+        Log.d("initiateLoginScreen", "opening login activity");
         AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
+        Log.d("initateLoginScreen", "login activity opened");
     }
 
     @Override
@@ -74,7 +75,7 @@ public class EntryActivity extends AppCompatActivity
 
                 // Most likely auth flow was cancelled
                 default:
-                    // Handle other cases
+                    Log.d("OnActivityResult", "Fallen to default case");
             }
 
         }

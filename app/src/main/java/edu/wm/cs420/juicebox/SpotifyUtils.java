@@ -44,6 +44,7 @@ public class SpotifyUtils {
     public static void setAccessToken(String token) {
         accessToken =  token;
         getSpotifyApi().setAccessToken(accessToken);
+        Log.d("good", "reached end of method");
     }
 
     public static void setApplicationContext(){
