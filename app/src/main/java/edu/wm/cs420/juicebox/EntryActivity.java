@@ -101,11 +101,25 @@ public class EntryActivity extends AppCompatActivity
         // Query the databse
         SpotifyUtils.getSpotifyService().getMe(new Callback<UserPrivate>() {
             @Override
-            public void success(UserPrivate userPrivate, Response response) {
+            public void success(final UserPrivate userPrivate, Response response) {
                 if(userPrivate.product != "premium"){
-                    Log.d(TAG, "User does not have premium subscription!");
+                    Log.d(TAG, "User does not have premium subscription! Subscription is type: "+ userPrivate.product);
                 };
-                DatabaseUtils.createUser(userPrivate.id, userPrivate.display_name, userPrivate.images);
+                DatabaseUtils.getUser(userPrivate.id, new DatabaseUtils.DatabaseCallback<JuiceboxUser>(){
+                    @Override
+                    public void success(JuiceboxUser result) {
+                        if(result == null){
+                            Log.d(TAG, "User Does not exist, creating user!");
+                            result = DatabaseUtils.createUser(userPrivate);
+                        }else{
+                            // Update the user's shit
+                            Log.d(TAG, "Found the user! Store that bad boy!");
+                        }
+                        // store the user for use in the application
+                    }
+                    @Override
+                    public void failure() {}
+                });
                 openMainActivity();
             }
 

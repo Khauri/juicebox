@@ -95,7 +95,7 @@ public class MainActivity
 
         //
         getAlbum();
-        DatabaseUtils.createParty();
+        //DatabaseUtils.createParty();
     }
 
     public void getAlbum(){
@@ -120,7 +120,7 @@ public class MainActivity
 
             }
         });
-    }
+}
 
 
     @Override
