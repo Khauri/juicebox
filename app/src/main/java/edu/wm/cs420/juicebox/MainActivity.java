@@ -30,7 +30,7 @@ import retrofit.client.Response;
 public class MainActivity
         extends AppCompatActivity
         implements QueueFragment.OnFragmentInteractionListener,
-        SearchFragment.OnFragmentInteractionListener,
+        SearchFragment.OnAddToQueueListener,
         SocialFragment.OnFragmentInteractionListener,
         SpotifyPlayer.NotificationCallback {
 
@@ -45,6 +45,10 @@ public class MainActivity
     private static final int REQUEST_CODE = 1337;
     private Player mPlayer;
     private String accessToken;
+
+    private static QueueFragment queueFragment;
+    private static SearchFragment searchFragment;
+    private static SocialFragment socialFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,8 +149,19 @@ public class MainActivity
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
-        // Does nothing but is required
+    public void onFragmentInteraction(Uri uri){
+        //do nothing for now
+    }
+
+    @Override
+    public void onAddToQueue(SongListItem song) {
+        if (queueFragment == null){
+            Log.d("onAddToQueue", "queueFragment is null!");
+        }
+        else{
+            Log.d("onAddToQueue", "queueFragment is NOT null!");
+        }
+        queueFragment.updateQueue(song);
     }
 
     @Override
@@ -171,13 +186,22 @@ public class MainActivity
 
         @Override
         public Fragment getItem(int position) {
-            switch(position){
+            switch(position) {
                 case 0:
-                    return SearchFragment.newInstance("Hello", "World");
+                    if (searchFragment == null) {
+                        searchFragment = SearchFragment.newInstance("Hello", "World");
+                    }
+                    return searchFragment;
                 case 1:
-                    return QueueFragment.newInstance("Hello", "World");
+                    if (queueFragment == null) {
+                        queueFragment = QueueFragment.newInstance("Hello", "World");
+                    }
+                    return queueFragment;
                 case 2:
-                    return SocialFragment.newInstance("Hello", "World");
+                    if (socialFragment == null) {
+                        socialFragment = SocialFragment.newInstance("Hello", "World");
+                    }
+                    return socialFragment;
             }
             return null;
         }

@@ -27,7 +27,7 @@ import retrofit.client.Response;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link SearchFragment.OnFragmentInteractionListener} interface
+ * {@link SearchFragment.OnAddToQueueListener} interface
  * to handle interaction events.
  * Use the {@link SearchFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -42,7 +42,7 @@ public class SearchFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private OnFragmentInteractionListener mListener;
+    private OnAddToQueueListener queueListener;
 
     private EditText searchBar;
     private Button searchButton;
@@ -102,7 +102,8 @@ public class SearchFragment extends Fragment {
                    @Override
                    public void success(TracksPager trackPager, Response reponse){
                        List<Track> trackList = trackPager.tracks.items;
-                       lv.setAdapter(new SearchFragmentAdapter(getContext(), trackList));
+                       lv.setAdapter(new SearchFragmentAdapter(getContext(), trackList,
+                               SearchFragment.this));
                    }
 
                    @Override
@@ -116,18 +117,12 @@ public class SearchFragment extends Fragment {
         });
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnAddToQueueListener) {
+            queueListener = (OnAddToQueueListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -137,7 +132,7 @@ public class SearchFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        queueListener = null;
     }
 
     /**
@@ -150,8 +145,13 @@ public class SearchFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
+    public interface OnAddToQueueListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onAddToQueue(SongListItem song);
     }
+
+    public OnAddToQueueListener getListener(){
+        return queueListener;
+    }
+
 }

@@ -11,6 +11,10 @@ public class SongListItem {
     private String artist;
     private int lengthInSeconds;
 
+    SongListItem(String name){
+        name = songName;
+    }
+
     SongListItem(String name, String album, String artist, int length){
         songName = name;
         this.album = album;

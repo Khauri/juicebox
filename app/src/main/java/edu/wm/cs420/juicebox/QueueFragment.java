@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +58,7 @@ public class QueueFragment extends ListFragment implements AdapterView.OnItemCli
      */
     // TODO: Rename and change types and number of parameters
     public static QueueFragment newInstance(String param1, String param2) {
+        Log.d("newInstance", "NewInstance has been called!");
         QueueFragment fragment = new QueueFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
@@ -68,9 +71,6 @@ public class QueueFragment extends ListFragment implements AdapterView.OnItemCli
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         songList = new ArrayList();
-        songList.add(new SongListItem("song 1", "album 1", "artist 1", 500));
-        songList.add(new SongListItem("song 2", "album 2", "artist 2", 500));
-        songList.add(new SongListItem("song 3", "album 3", "artist 3", 500));
         adapter = new QueueFragmentAdapter(getActivity(), songList);
 
     }
@@ -79,9 +79,19 @@ public class QueueFragment extends ListFragment implements AdapterView.OnItemCli
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Log.d("onCreateView", "onCreateView called");
         View view = inflater.inflate(R.layout.fragment_queue, container, false);
+        adapter = new QueueFragmentAdapter(getActivity(), songList);
         setListAdapter(adapter);
         return view;
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Log.d("OnResume", "onResume() called!");
+        adapter = new QueueFragmentAdapter(getActivity(), songList);
+        setListAdapter(adapter);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -127,5 +137,37 @@ public class QueueFragment extends ListFragment implements AdapterView.OnItemCli
     public void onItemClick(AdapterView<?> parent, View view, int position, long id){
         SongListItem item = this.songList.get(position);
         Toast.makeText(getActivity(), item.getName() + " Clicked!", Toast.LENGTH_SHORT).show();
+    }
+
+    //following two methods help us save the state of the fragment
+    @Override
+    public void onSaveInstanceState(final Bundle outstate){
+        super.onSaveInstanceState(outstate);
+        outstate.putSerializable("list", (Serializable) songList);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState){
+        super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState != null){
+            songList = (List<SongListItem>) savedInstanceState.getSerializable("list");
+        }
+        //everything should be fine here...
+    }
+
+    public List<SongListItem> getSongList(){
+        return songList;
+    }
+
+    public QueueFragmentAdapter getAdapter(){
+        return adapter;
+    }
+
+    public void updateQueue(SongListItem song){
+        Log.d("updateQueue", "updateQueue called!");
+        songList.add(song);
+        adapter = new QueueFragmentAdapter(getActivity(), songList);
+        setListAdapter(adapter);
     }
 }
