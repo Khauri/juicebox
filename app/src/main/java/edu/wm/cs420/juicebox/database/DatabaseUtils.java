@@ -3,8 +3,11 @@ package edu.wm.cs420.juicebox.database;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.List;
+
 import edu.wm.cs420.juicebox.database.models.JuiceboxParty;
 import edu.wm.cs420.juicebox.database.models.JuiceboxUser;
+import kaaes.spotify.webapi.android.models.Image;
 
 /**
  * Created by Khauri on 2/27/2018.
@@ -21,7 +24,7 @@ public class DatabaseUtils {
         return mDatabase;
     }
 
-    public static JuiceboxUser createUser(String spotifyID){
+    public static JuiceboxUser createUser(String spotfyId, String name, List<Image> images){
         JuiceboxUser juiceboxUser = new JuiceboxUser();
         return juiceboxUser;
     }
