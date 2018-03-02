@@ -5,9 +5,23 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+
+import java.util.List;
+
+import kaaes.spotify.webapi.android.SpotifyApi;
+import kaaes.spotify.webapi.android.SpotifyService;
+import kaaes.spotify.webapi.android.models.Track;
+import kaaes.spotify.webapi.android.models.TracksPager;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 
 /**
@@ -29,6 +43,10 @@ public class SearchFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    private EditText searchBar;
+    private Button searchButton;
+    private ListView lv;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -66,6 +84,36 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_search, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState){
+        searchBar = getView().findViewById(R.id.search_bar);
+        searchButton = getView().findViewById(R.id.search_button);
+        lv = view.findViewById(R.id.search_results);
+        searchButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+               String searchQuery = searchBar.getText().toString();
+               SpotifyApi api = SpotifyUtils.getSpotifyApi();
+               SpotifyService service = api.getService();
+
+               service.searchTracks(searchQuery, new Callback<TracksPager>(){
+                   @Override
+                   public void success(TracksPager trackPager, Response reponse){
+                       List<Track> trackList = trackPager.tracks.items;
+                       lv.setAdapter(new SearchFragmentAdapter(getContext(), trackList));
+                   }
+
+                   @Override
+                   public void failure(RetrofitError error){
+                       Log.d("RetrofitError", error.getMessage());
+                   }
+               });
+
+
+            }
+        });
     }
 
     // TODO: Rename method, update argument and hook method into UI event

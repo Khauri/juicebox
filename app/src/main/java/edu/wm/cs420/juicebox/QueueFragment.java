@@ -40,7 +40,7 @@ public class QueueFragment extends ListFragment implements AdapterView.OnItemCli
 
     private ListView lv;
 
-    private QueueAdapter adapter;
+    private QueueFragmentAdapter adapter;
 
     public QueueFragment() {
         // Required empty public constructor
@@ -71,7 +71,7 @@ public class QueueFragment extends ListFragment implements AdapterView.OnItemCli
         songList.add(new SongListItem("song 1", "album 1", "artist 1", 500));
         songList.add(new SongListItem("song 2", "album 2", "artist 2", 500));
         songList.add(new SongListItem("song 3", "album 3", "artist 3", 500));
-        adapter = new QueueAdapter(getActivity(), songList);
+        adapter = new QueueFragmentAdapter(getActivity(), songList);
 
     }
 

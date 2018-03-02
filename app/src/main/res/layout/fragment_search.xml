@@ -5,11 +5,55 @@
     android:background="?attr/colorPrimaryDark"
     tools:context="edu.wm.cs420.juicebox.SearchFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="SEARCH FRAGMENT"
-        android:textColor="@android:color/background_light" />
+        android:orientation="vertical"
+        android:weightSum="1">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:text="SEARCH FRAGMENT"
+            android:textColor="@android:color/background_light"
+            android:layout_weight="0.05"/>
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            android:layout_weight="0.1"
+            android:weightSum="1">
+
+            <EditText
+                android:id="@+id/search_bar"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:text="Search for tracks or artists!"
+                android:textColor="@android:color/background_light"
+                android:layout_weight="0.75"/>
+
+            <Button
+                android:id="@+id/search_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.25"
+                android:text="Search" />
+
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/search_results"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.85"/>
+
+    </LinearLayout>
 
 </FrameLayout>

@@ -15,11 +15,11 @@ import java.util.List;
  * Created by alanz on 3/1/18.
  */
 
-public class QueueAdapter extends ArrayAdapter {
+public class QueueFragmentAdapter extends ArrayAdapter {
 
     private Context context;
 
-    public QueueAdapter(Context context, List items) {
+    public QueueFragmentAdapter(Context context, List items) {
         super(context, android.R.layout.simple_list_item_1, items);
         this.context = context;
     }
