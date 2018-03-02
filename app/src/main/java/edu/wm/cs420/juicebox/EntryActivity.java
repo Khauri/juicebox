@@ -13,6 +13,13 @@ import com.spotify.sdk.android.authentication.AuthenticationResponse;
 import com.spotify.sdk.android.player.ConnectionStateCallback;
 import com.spotify.sdk.android.player.Error;
 
+import edu.wm.cs420.juicebox.database.DatabaseUtils;
+import edu.wm.cs420.juicebox.database.models.JuiceboxUser;
+import kaaes.spotify.webapi.android.models.UserPrivate;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+
 import static com.spotify.sdk.android.authentication.AuthenticationResponse.Type.TOKEN;
 
 public class EntryActivity extends AppCompatActivity
@@ -80,13 +87,32 @@ public class EntryActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onLoggedIn() {
-        Log.d(TAG, "onLoggedIn: Opening new activity");
+    private void openMainActivity(){
         Intent nextActivity = new Intent(getBaseContext(), MainActivity.class);
         //give the access token to the next activity so that we can make API calls
         nextActivity.putExtra("token", accessToken);
         startActivity(nextActivity);
+    }
+
+    @Override
+    public void onLoggedIn() {
+        Log.d(TAG, "onLoggedIn: Opening new activity");
+        // Query the databse
+        SpotifyUtils.getSpotifyService().getMe(new Callback<UserPrivate>() {
+            @Override
+            public void success(UserPrivate userPrivate, Response response) {
+                if(userPrivate.product != "premium"){
+                    Log.d(TAG, "User does not have premium subscription!");
+                };
+                DatabaseUtils.createUser(userPrivate.id, userPrivate.display_name, userPrivate.images);
+                openMainActivity();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                // I dunno what we should do here
+            }
+        });
     }
 
     @Override
