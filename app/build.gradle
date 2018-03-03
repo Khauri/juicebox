@@ -49,6 +49,9 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation project(':spotify-player-24-noconnect-2.20b')
     compile 'com.github.kaaes:spotify-web-api-android:0.4.1'
+    // More third party libraries
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'de.hdodenhof:circleimageview:2.2.0'
 }
 
 

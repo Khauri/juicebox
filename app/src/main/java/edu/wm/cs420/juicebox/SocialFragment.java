@@ -8,7 +8,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import edu.wm.cs420.juicebox.database.models.JuiceboxUser;
 import edu.wm.cs420.juicebox.user.UserUpdateListener;
@@ -39,7 +42,8 @@ public class SocialFragment extends Fragment implements UserUpdateListener {
     private OnFragmentInteractionListener mListener;
 
     // widgets and components
-    TextView app_user_name;
+    private TextView app_user_name;
+    private ImageView profile_pic;
 
     public SocialFragment() {
         // Required empty public constructor
@@ -64,8 +68,15 @@ public class SocialFragment extends Fragment implements UserUpdateListener {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //outState.putStringArrayList("dsf", " ");
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        UserUtils.addUpdateListener(this);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -82,7 +93,9 @@ public class SocialFragment extends Fragment implements UserUpdateListener {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState){
         app_user_name = getView().findViewById(R.id.app_user_name);
-        UserUtils.addUpdateListener(this);
+        profile_pic = getView().findViewById(R.id.appbar_profile_pic);
+        // When the view gets recreated we'll just manually call this method
+        userUpdated(UserUtils.getUser());
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -116,8 +129,12 @@ public class SocialFragment extends Fragment implements UserUpdateListener {
 
     @Override
     public void userUpdated(JuiceboxUser user) {
-        Log.d(TAG, "userUpdated: user updated!");
-        app_user_name.setText(user.name);
+        if(user != null) {
+            Log.d(TAG, "userUpdated: user updated!");
+            app_user_name.setText(user.name);
+            Log.d(TAG, "userUpdated: " + user.images.get(0).url);
+            Picasso.with(getContext()).load(user.images.get(0).url).into(profile_pic);
+        }
     }
 
     /**
