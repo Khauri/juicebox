@@ -13,8 +13,7 @@ import com.spotify.sdk.android.authentication.AuthenticationResponse;
 import com.spotify.sdk.android.player.ConnectionStateCallback;
 import com.spotify.sdk.android.player.Error;
 
-import edu.wm.cs420.juicebox.database.DatabaseUtils;
-import edu.wm.cs420.juicebox.database.models.JuiceboxUser;
+import edu.wm.cs420.juicebox.user.UserUtils;
 import kaaes.spotify.webapi.android.models.UserPrivate;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -96,30 +95,20 @@ public class EntryActivity extends AppCompatActivity
     }
 
     @Override
-    public void onLoggedIn() {
-        Log.d(TAG, "onLoggedIn: Opening new activity");
+    public void onLoggedIn(){
+        Log.d(TAG, "onLoggedIn: Performing Post-authentication checks.");
         // Query the databse
         SpotifyUtils.getSpotifyService().getMe(new Callback<UserPrivate>() {
             @Override
             public void success(final UserPrivate userPrivate, Response response) {
-                if(userPrivate.product != "premium"){
+                if(!userPrivate.product.equals("premium")){
+                    // If the user doesn't have a premium account here is where it's detected!
                     Log.d(TAG, "User does not have premium subscription! Subscription is type: "+ userPrivate.product);
-                };
-                DatabaseUtils.getUser(userPrivate.id, new DatabaseUtils.DatabaseCallback<JuiceboxUser>(){
-                    @Override
-                    public void success(JuiceboxUser result) {
-                        if(result == null){
-                            Log.d(TAG, "User Does not exist, creating user!");
-                            result = DatabaseUtils.createUser(userPrivate);
-                        }else{
-                            // Update the user's shit
-                            Log.d(TAG, "Found the user! Store that bad boy!");
-                        }
-                        // store the user for use in the application
-                    }
-                    @Override
-                    public void failure() {}
-                });
+                }else{
+                    Log.d(TAG, "User had a premium account! Good to go!");
+                }
+                // Initialize and store information about the user
+                UserUtils.initializeUser(userPrivate);
                 openMainActivity();
             }
 

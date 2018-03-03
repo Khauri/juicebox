@@ -11,6 +11,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.List;
 
 import edu.wm.cs420.juicebox.database.models.JuiceboxParty;
+import edu.wm.cs420.juicebox.database.models.JuiceboxTrack;
 import edu.wm.cs420.juicebox.database.models.JuiceboxUser;
 import kaaes.spotify.webapi.android.models.Image;
 import kaaes.spotify.webapi.android.models.Track;
@@ -41,8 +42,24 @@ public class DatabaseUtils {
         return party;
     }
 
-    public static void addTrackToParty(String partyId, Track track){
-
+    public static void addTrackToParty(final String partyId, final Track track, final DatabaseCallback<JuiceboxTrack> callback){
+        getParty(partyId, new DatabaseCallback<JuiceboxParty>() {
+            @Override
+            public void success(JuiceboxParty result) {
+                if(result == null){
+                    callback.failure();
+                }else{
+                    // The party exists so let's add the the track to the queue
+                    JuiceboxTrack juiceboxTrack = new JuiceboxTrack(track);
+                    getDatabase().child(partyEndpoint + partyId).child("queue").push().setValue(track);
+                    callback.success(juiceboxTrack);
+                }
+            }
+            @Override
+            public void failure() {
+                Log.d(TAG, "Track could not be added. Party does not exist!");
+            }
+        });
     }
 
     public static JuiceboxUser createUser(UserPrivate userPrivate) {
@@ -52,17 +69,26 @@ public class DatabaseUtils {
         return juiceboxUser;
     }
 
+    /**
+     * Retrieves a party from the firebase RTD
+     * @param id the id of the party
+     * @param callback
+     */
     public static void getParty(String id, final DatabaseCallback<JuiceboxParty> callback){
         getDatabase().child(partyEndpoint + id).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 JuiceboxParty juiceboxParty = dataSnapshot.getValue(JuiceboxParty.class);
-                callback.success(juiceboxParty);
+                if(juiceboxParty == null){
+                    callback.failure();
+                }else{
+                    callback.success(juiceboxParty);
+                }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                callback.failure();
+                callback.cancelled();
             }
         });
     }
@@ -77,12 +103,16 @@ public class DatabaseUtils {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 JuiceboxUser user = dataSnapshot.getValue(JuiceboxUser.class);
-                callback.success(user);
+                if(user == null){
+                    callback.failure();
+                }else{
+                    callback.success(user);
+                }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                callback.failure();
+                callback.cancelled();
             }
         });
     }
@@ -90,5 +120,8 @@ public class DatabaseUtils {
     public static abstract class DatabaseCallback<T>{
         public abstract void success(T result);
         public abstract void failure();
+        public void cancelled(){
+            Log.d(TAG, "Request was cancelled");
+        };
     }
 }

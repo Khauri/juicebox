@@ -4,9 +4,17 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import edu.wm.cs420.juicebox.database.models.JuiceboxUser;
+import edu.wm.cs420.juicebox.user.UserUpdateListener;
+import edu.wm.cs420.juicebox.user.UserUtils;
+
+import static android.content.ContentValues.TAG;
 
 
 /**
@@ -17,7 +25,8 @@ import android.view.ViewGroup;
  * Use the {@link SocialFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SocialFragment extends Fragment {
+public class SocialFragment extends Fragment implements UserUpdateListener {
+    private static final String TAG = "Juicebox-SocialFragment";
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -28,6 +37,9 @@ public class SocialFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    // widgets and components
+    TextView app_user_name;
 
     public SocialFragment() {
         // Required empty public constructor
@@ -67,6 +79,12 @@ public class SocialFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_social, container, false);
     }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState){
+        app_user_name = getView().findViewById(R.id.app_user_name);
+        UserUtils.addUpdateListener(this);
+    }
+
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -89,6 +107,17 @@ public class SocialFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void userCreated(JuiceboxUser user) {
+
+    }
+
+    @Override
+    public void userUpdated(JuiceboxUser user) {
+        Log.d(TAG, "userUpdated: user updated!");
+        app_user_name.setText(user.name);
     }
 
     /**

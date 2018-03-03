@@ -4,6 +4,8 @@ import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.HashMap;
 
+import kaaes.spotify.webapi.android.models.Track;
+
 /**
  * Created by Khauri on 2/28/2018.
  */
@@ -21,10 +23,17 @@ public class JuiceboxTrack {
     public String   album_title;
     public String   song_artist;
     public String   song_title;
-    public int      duration;
+    public long     duration;
 
     public JuiceboxTrack(){
 
     }
 
+    public JuiceboxTrack(Track track) {
+        this.album_title = track.album.name;
+        this.song_artist = track.artists.get(0).name;
+        this.song_title  = track.name;
+        this.duration    = track.duration_ms;
+        this.spotify_id  = track.id;
+    }
 }
