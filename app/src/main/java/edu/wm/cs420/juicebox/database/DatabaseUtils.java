@@ -22,11 +22,11 @@ import kaaes.spotify.webapi.android.models.UserPrivate;
  */
 
 public class DatabaseUtils {
+    private static String TAG = "Juicebox-DatabaseUtils";
 
     private static DatabaseReference mDatabase;
-    private static String usersEndpoint = "users/";
-    private static String partyEndpoint = "parties/";
-    private static String TAG = "JuiceboxDatabaseUtils";
+    public static String usersEndpoint = "users/";
+    public static String partyEndpoint = "parties/";
 
     public static DatabaseReference getDatabase(){
         if(mDatabase == null){
@@ -93,7 +93,7 @@ public class DatabaseUtils {
         });
     }
     /**
-     * Gets a user given their spotify id from the firebase RTD
+     * Gets a user once given their spotify id from the firebase RTD
      * @param id
      * @param callback
      * @return
@@ -113,6 +113,20 @@ public class DatabaseUtils {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 callback.cancelled();
+            }
+        });
+    }
+
+    public static void watchUser(String id, final DatabaseCallback<JuiceboxUser> callback){
+        getDatabase().child(usersEndpoint + id).addValueEventListener(new ValueEventListener(){
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
     }

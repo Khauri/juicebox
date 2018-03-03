@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.text.NumberFormat;
+
 import edu.wm.cs420.juicebox.database.models.JuiceboxUser;
 import edu.wm.cs420.juicebox.user.UserUpdateListener;
 import edu.wm.cs420.juicebox.user.UserUtils;
@@ -44,6 +46,7 @@ public class SocialFragment extends Fragment implements UserUpdateListener {
     // widgets and components
     private TextView app_user_name;
     private ImageView profile_pic;
+    private TextView reputation_num;
 
     public SocialFragment() {
         // Required empty public constructor
@@ -94,6 +97,7 @@ public class SocialFragment extends Fragment implements UserUpdateListener {
     public void onViewCreated(View view, Bundle savedInstanceState){
         app_user_name = getView().findViewById(R.id.app_user_name);
         profile_pic = getView().findViewById(R.id.appbar_profile_pic);
+        reputation_num = getView().findViewById(R.id.app_user_reputation);
         // When the view gets recreated we'll just manually call this method
         userUpdated(UserUtils.getUser());
     }
@@ -132,7 +136,7 @@ public class SocialFragment extends Fragment implements UserUpdateListener {
         if(user != null) {
             Log.d(TAG, "userUpdated: user updated!");
             app_user_name.setText(user.name);
-            Log.d(TAG, "userUpdated: " + user.images.get(0).url);
+            reputation_num.setText(NumberFormat.getInstance().format(user.reputation));
             Picasso.with(getContext()).load(user.images.get(0).url).into(profile_pic);
         }
     }

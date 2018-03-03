@@ -22,7 +22,10 @@ public class JuiceboxParty {
     public List<JuiceboxTrack> queue;
     public String location;
     public int radius;
+    public String created_at;
     public String pl_id; // id of party playlist
+    public List<String> participants;
+
 
     public JuiceboxParty(){
 

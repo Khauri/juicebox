@@ -2,6 +2,10 @@ package edu.wm.cs420.juicebox.user;
 
 import android.util.Log;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -19,10 +23,11 @@ import kaaes.spotify.webapi.android.models.UserPrivate;
  */
 
 public class UserUtils {
-    private static String TAG = "UserUtils";
-    private static enum EVENT_TYPES {UserUpdated};
-    private static JuiceboxUser user;
-    private static JuiceboxParty party;
+    private static  String TAG = "UserUtils";
+
+    private enum    EVENT_TYPES {UserUpdated};
+    private static  JuiceboxUser user;
+    private static  JuiceboxParty party;
 
     private static List<UserUpdateListener> listeners = new ArrayList<>();
 
@@ -45,6 +50,21 @@ public class UserUtils {
                 update(EVENT_TYPES.UserUpdated);
             }
         });
+        // Watch the user for changes
+        DatabaseUtils.getDatabase()
+                .child(DatabaseUtils.usersEndpoint + userPrivate.id)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        user = dataSnapshot.getValue(JuiceboxUser.class);
+                        update(EVENT_TYPES.UserUpdated);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        // Do nothing I guess
+                    }
+                });
     }
 
     public static JuiceboxUser getUser(){
