@@ -76,6 +76,7 @@ public class MainActivity
 
         // change menu item on scroll
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            private MenuItem prevItem;
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 // Do nothing
@@ -83,8 +84,10 @@ public class MainActivity
 
             @Override
             public void onPageSelected(int position) {
-                // change selected menu item
-                // be careful of recursive accidents
+                if(prevItem != null)
+                    prevItem.setChecked(false);
+                bottomNavigationView.getMenu().getItem(position).setChecked(true);
+                prevItem = bottomNavigationView.getMenu().getItem(position);
             }
 
             @Override
