@@ -93,4 +93,5 @@
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="profile_picture_description">Profile Picture of User</string>
     <string name="placeholder_text_short">lorem impsum dolor sit amet</string>
+    <string name="party_name">Party Name</string>
 </resources>

@@ -18,7 +18,7 @@
         android:theme="@style/AppTheme">
 
         <!-- our application activities -->
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
         <activity android:name=".EntryActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,6 +42,7 @@
             </intent-filter>
         </service>
 
+        <activity android:name=".NewPartyActivity"></activity>
     </application>
 
 </manifest>
