@@ -35,9 +35,9 @@ public class DatabaseUtils {
         return mDatabase;
     }
 
-    public static JuiceboxParty createParty(){
+    public static JuiceboxParty createParty(String hostId, String partyName, String partyDesc, String latLong, int radius, int privacy){
         String id = getDatabase().child(partyEndpoint).push().getKey();
-        JuiceboxParty party = new JuiceboxParty(id, "MyParty", "Here", 2);
+        JuiceboxParty party = new JuiceboxParty(hostId, partyName, partyDesc, latLong, radius, privacy);
         getDatabase().child("parties").child(id).setValue(party);
         return party;
     }
@@ -103,6 +103,7 @@ public class DatabaseUtils {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 JuiceboxUser user = dataSnapshot.getValue(JuiceboxUser.class);
+                user.id = dataSnapshot.getKey();
                 if(user == null){
                     callback.failure();
                 }else{

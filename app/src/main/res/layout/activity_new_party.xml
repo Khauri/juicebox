@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryDark"
+    android:background="@color/colorBlack"
     tools:context="edu.wm.cs420.juicebox.NewPartyActivity">
 
     <LinearLayout
@@ -24,7 +24,7 @@
             android:paddingRight="25dp"
             android:text="YOU'RE 3 STEPS AWAY FROM AN EPIC PARTY"
             android:textAlignment="center"
-            android:textColor="@android:color/white"
+            android:textColor="@color/colorAccentNewPartyActivity"
             android:textSize="24sp"
             android:textStyle="bold" />
 
@@ -39,6 +39,7 @@
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
             android:layout_marginTop="15dp"
             app:cardBackgroundColor="@color/colorSecondaryDark"
             app:contentPadding="10dp">
@@ -53,7 +54,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="1. PARTY INFO"
-                    android:textColor="@color/colorAccent1"
+                    android:textColor="@color/colorSecondaryBlack"
                     android:textSize="18sp" />
 
                 <android.support.design.widget.TextInputLayout
@@ -102,6 +103,7 @@
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
             android:layout_marginTop="15dp"
             app:cardBackgroundColor="@color/colorSecondaryDark"
             app:contentPadding="10dp">
@@ -116,39 +118,49 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="2. PRIVACY"
-                    android:textColor="@color/colorAccent1"
+                    android:textColor="@color/colorSecondaryBlack"
                     android:textSize="18sp" />
 
                 <RadioGroup
+                    android:id="@+id/privacy_toggle_rGroup"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal">
 
                     <ToggleButton
-                        android:id="@+id/toggleButton3"
+                        android:id="@+id/friendly_toggle_button"
+                        style="@style/toggleButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:checked="false"
-                        android:includeFontPadding="false"
+                        android:background="@drawable/toggle_selector"
+                        android:checked="true"
+                        android:includeFontPadding="true"
+                        android:onClick="onToggle"
                         android:text="ToggleButton"
                         android:textOff="Friendly"
                         android:textOn="Friendly" />
 
                     <ToggleButton
-                        android:id="@+id/toggleButton2"
+                        android:id="@+id/invite_toggle_button"
+                        style="@style/toggleButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:background="@drawable/toggle_selector"
+                        android:onClick="onToggle"
                         android:text="ToggleButton"
                         android:textOff="Invite"
                         android:textOn="Invite" />
 
                     <ToggleButton
-                        android:id="@+id/toggleButton"
+                        android:id="@+id/public_toggle_button"
+                        style="@style/toggleButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:background="@drawable/toggle_selector"
+                        android:onClick="onToggle"
                         android:text="ToggleButton"
                         android:textOff="Public"
                         android:textOn="Public" />
@@ -189,11 +201,11 @@
                         android:layout_marginTop="4dp"
                         android:layout_weight="1"
                         android:text="3. PARTY RADIUS"
-                        android:textColor="@color/colorAccent1"
+                        android:textColor="@color/colorSecondaryBlack"
                         android:textSize="18sp" />
 
                     <TextView
-                        android:id="@+id/textView12"
+                        android:id="@+id/radius_display_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -208,7 +220,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:max="10"
-                    android:progress="0" />
+                    android:progress="5"
+                    android:progressTint="@color/colorAccentNewPartyActivity"
+                    android:secondaryProgressTint="@color/colorAccentNewPartyActivity"
+                    android:thumbTint="@color/colorAccentNewPartyActivity"
+                    android:thumbTintMode="src_atop" />
 
             </LinearLayout>
 
@@ -223,7 +239,7 @@
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/colorGoGreen">
+                app:cardBackgroundColor="@color/colorAccentNewPartyActivity">
 
                 <Button
                     android:id="@+id/create_party_button"

@@ -18,7 +18,7 @@ import kaaes.spotify.webapi.android.models.Image;
 public class JuiceboxUser {
 
     @Exclude
-    public String s_id; // JuiceboxUser's spotify id
+    public String id; // JuiceboxUser's spotify id
 
     public String name;
     public String party_id; // id of party user is in

@@ -6,4 +6,12 @@
     <color name="colorSecondaryDark">#eeeeee</color>
     <color name="colorAccent1">#c62828</color>
     <color name="colorGoGreen">#76ff03</color>
+    <color name="colorAccentGreen">#14a76c</color>
+    <color name="colorAccentYellow">#ffe400</color>
+    <color name="colorAccentOrange">#ff6524</color>
+    <color name="colorBlack">#272727</color>
+    <color name="colorGrey">#747474</color>
+    <color name="colorSecondaryBlack">#424242</color>
+    <color name="colorAccentYellowDarker">#f3d600</color>
+    <color name="colorAccentNewPartyActivity">@color/colorAccentYellow</color>
 </resources>

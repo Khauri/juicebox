@@ -90,9 +90,22 @@ public class UserUtils {
     /**
      * Creates a party and sets this user as the host
      * If already in a party then this will do nothing (for now)
+     * @param partyName
+     * @param partyDesc
+     * @param latLong
+     * @param radius
+     * @param privacy
      */
-    public static void hostParty(){
-
+    public static void hostParty(String partyName, String partyDesc, String latLong, int radius, int privacy){
+        if(user == null){
+            // welp
+            Log.d(TAG, "hostParty: User Not initialized");
+            return;
+        }
+        Log.d(TAG, "hostParty: Creating Party");
+        party = DatabaseUtils.createParty(user.id, partyName, partyDesc, latLong, radius, privacy);
+        Log.d(TAG, "hostParty: Adding User to the party");
+//        DatabaseUtils.watchParty(party.id);
     }
 
     /**

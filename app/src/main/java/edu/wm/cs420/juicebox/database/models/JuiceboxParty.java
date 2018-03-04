@@ -27,7 +27,7 @@ public class JuiceboxParty {
     public List<String> participants;
 
 
-    public JuiceboxParty(){
+    public JuiceboxParty(String hostId, String partyName, String partyDesc, String latLong, int radius, int privacy){
 
     }
 
