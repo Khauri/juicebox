@@ -49,20 +49,7 @@ public class EntryActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-      //  if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M ) {
-      //      Log.d("check","got here1");
-      //      checkPermission();
-       // }
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                ){//Can add more as per requirement
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},
-                    123);
-            getLocation();
-            Log.d("tag","got hereeeee");
-        }
+        getLocation();
         Button signInButton = (Button) findViewById(R.id.button);
         signInButton.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -73,29 +60,6 @@ public class EntryActivity extends AppCompatActivity
     }
 
     public void getLocation(){
-        Log.d("tag","got here3");
-        try{
-            mFusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            Log.d("check","got here4");
-                            latitude = location.getLatitude();
-                            longitude = location.getLongitude();
-                            Log.d("location", "latitude is" + latitude + ", longitude is" + longitude);
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                // Logic to handle location object
-                            }
-                        }
-                    });
-        } catch (SecurityException e) {
-
-        } catch (Exception e) {
-
-        }
-    }
-    public void checkPermission(){
         Log.d("check","got here2");
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -104,9 +68,22 @@ public class EntryActivity extends AppCompatActivity
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},
                     123);
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            Log.d("check","got here4");
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                latitude = location.getLatitude();
+                                longitude = location.getLongitude();
+                                Log.d("location", "latitude is" + latitude + ", longitude is" + longitude);
+                            }
+                        }
+                    });
         }
+        Log.d("tag","got here3");
     }
-
     private void initiateLoginScreen(){
         // Authentifications
         AuthenticationRequest.Builder builder;
