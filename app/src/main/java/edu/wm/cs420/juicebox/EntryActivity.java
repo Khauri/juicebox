@@ -21,6 +21,12 @@ import com.spotify.sdk.android.authentication.AuthenticationResponse;
 import com.spotify.sdk.android.player.ConnectionStateCallback;
 import com.spotify.sdk.android.player.Error;
 
+import edu.wm.cs420.juicebox.user.UserUtils;
+import kaaes.spotify.webapi.android.models.UserPrivate;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+
 import static com.spotify.sdk.android.authentication.AuthenticationResponse.Type.TOKEN;
 
 public class EntryActivity extends AppCompatActivity
@@ -141,9 +147,7 @@ public class EntryActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onLoggedIn() {
-        Log.d(TAG, "onLoggedIn: Opening new activity");
+    private void openMainActivity(){
         Intent nextActivity = new Intent(getBaseContext(), MainActivity.class);
         //give the access token to the next activity so that we can make API calls
         nextActivity.putExtra("token", accessToken);
@@ -151,8 +155,33 @@ public class EntryActivity extends AppCompatActivity
     }
 
     @Override
+    public void onLoggedIn(){
+        Log.d(TAG, "onLoggedIn: Performing Post-authentication checks.");
+        // Query the databse
+        SpotifyUtils.getSpotifyService().getMe(new Callback<UserPrivate>() {
+            @Override
+            public void success(final UserPrivate userPrivate, Response response) {
+                if(!userPrivate.product.equals("premium")){
+                    // If the user doesn't have a premium account here is where it's detected!
+                    Log.d(TAG, "User does not have premium subscription! Subscription is type: "+ userPrivate.product);
+                }else{
+                    Log.d(TAG, "User had a premium account! Good to go!");
+                }
+                // Initialize and store information about the user
+                UserUtils.initializeUser(userPrivate);
+                openMainActivity();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                // I dunno what we should do here
+            }
+        });
+    }
+
+    @Override
     public void onLoggedOut() {
-        Log.d(TAG, "onLoggedOut: User Logged Out");
+        Log.d(TAG, "onLoggedOut: JuiceboxUser Logged Out");
     }
 
     @Override

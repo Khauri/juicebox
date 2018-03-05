@@ -40,7 +40,7 @@ public class QueueFragmentAdapter extends ArrayAdapter {
         if (convertView == null) {
             viewToUse = mInflater.inflate(R.layout.song_list_item, null);
             holder = new ViewHolder();
-            holder.titleText = (TextView) viewToUse.findViewById(R.id.titleTextView);
+            holder.titleText = (TextView) viewToUse.findViewById(R.id.track_name_text);
             viewToUse.setTag(holder);
         } else {
             viewToUse = convertView;

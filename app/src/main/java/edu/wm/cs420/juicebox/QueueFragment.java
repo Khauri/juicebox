@@ -1,5 +1,6 @@
 package edu.wm.cs420.juicebox;
 
+import android.content.Intent;
 import android.support.v4.app.ListFragment;
 import android.content.Context;
 import android.net.Uri;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -27,7 +29,7 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class QueueFragment extends ListFragment implements AdapterView.OnItemClickListener {
-    // TODO: Rename parameter arguments, choose names that match
+    private static String TAG = "juicebox-QueueFragment";
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -43,6 +45,7 @@ public class QueueFragment extends ListFragment implements AdapterView.OnItemCli
     private ListView lv;
 
     private QueueFragmentAdapter adapter;
+    private Button btnNewParty;
 
     public QueueFragment() {
         // Required empty public constructor
@@ -84,6 +87,20 @@ public class QueueFragment extends ListFragment implements AdapterView.OnItemCli
         adapter = new QueueFragmentAdapter(getActivity(), songList);
         setListAdapter(adapter);
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        btnNewParty = getView().findViewById(R.id.button_create_party);
+        btnNewParty.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), NewPartyActivity.class);
+                // Maybe use startActivityForResult?
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

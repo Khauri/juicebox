@@ -4,9 +4,22 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
+
+import java.text.NumberFormat;
+
+import edu.wm.cs420.juicebox.database.models.JuiceboxUser;
+import edu.wm.cs420.juicebox.user.UserUpdateListener;
+import edu.wm.cs420.juicebox.user.UserUtils;
+
+import static android.content.ContentValues.TAG;
 
 
 /**
@@ -17,7 +30,8 @@ import android.view.ViewGroup;
  * Use the {@link SocialFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SocialFragment extends Fragment {
+public class SocialFragment extends Fragment implements UserUpdateListener {
+    private static final String TAG = "Juicebox-SocialFragment";
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -28,6 +42,11 @@ public class SocialFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    // widgets and components
+    private TextView app_user_name;
+    private ImageView profile_pic;
+    private TextView reputation_num;
 
     public SocialFragment() {
         // Required empty public constructor
@@ -52,8 +71,15 @@ public class SocialFragment extends Fragment {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //outState.putStringArrayList("dsf", " ");
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        UserUtils.addUpdateListener(this);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -65,6 +91,15 @@ public class SocialFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_social, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState){
+        app_user_name = getView().findViewById(R.id.app_user_name);
+        profile_pic = getView().findViewById(R.id.appbar_profile_pic);
+        reputation_num = getView().findViewById(R.id.app_user_reputation);
+        // When the view gets recreated we'll just manually call this method
+        userUpdated(UserUtils.getUser());
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -89,6 +124,21 @@ public class SocialFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void userCreated(JuiceboxUser user) {
+
+    }
+
+    @Override
+    public void userUpdated(JuiceboxUser user) {
+        if(user != null) {
+            Log.d(TAG, "userUpdated: user updated!");
+            app_user_name.setText(user.name);
+            reputation_num.setText(NumberFormat.getInstance().format(user.reputation));
+            Picasso.with(getContext()).load(user.images.get(0).url).into(profile_pic);
+        }
     }
 
     /**

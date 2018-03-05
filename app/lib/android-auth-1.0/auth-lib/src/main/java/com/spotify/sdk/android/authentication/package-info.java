@@ -23,7 +23,7 @@
  * Contains classes used in authentication process.
  * When called, SpotifyAuthentication opens a browser window and connects to the Spotify Accounts
  * Service at <a href="https://accounts.spotify.com" target="_top">https://accounts.spotify.com</a>.
- * User authentication and the authorization of scopes then follows the same path as user
+ * JuiceboxUser authentication and the authorization of scopes then follows the same path as user
  * authentication and authorization for the Spotify Web API.
  * For detailed information, see our <a href="https://developer.spotify.com/web-api/authorization-guide/" target="_top">Web API Authorization Guide.</a>
  */
