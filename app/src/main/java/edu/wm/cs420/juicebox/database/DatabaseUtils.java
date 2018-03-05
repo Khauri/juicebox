@@ -11,6 +11,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.List;
 
 import edu.wm.cs420.juicebox.database.models.JuiceboxParty;
+import edu.wm.cs420.juicebox.database.models.JuiceboxPlaylist;
 import edu.wm.cs420.juicebox.database.models.JuiceboxTrack;
 import edu.wm.cs420.juicebox.database.models.JuiceboxUser;
 import kaaes.spotify.webapi.android.models.Image;
@@ -27,6 +28,7 @@ public class DatabaseUtils {
     private static DatabaseReference mDatabase;
     public static String usersEndpoint = "users/";
     public static String partyEndpoint = "parties/";
+    public static String playlistEndpoint = "playlists/";
 
     public static DatabaseReference getDatabase(){
         if(mDatabase == null){
@@ -103,7 +105,6 @@ public class DatabaseUtils {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 JuiceboxUser user = dataSnapshot.getValue(JuiceboxUser.class);
-                user.id = dataSnapshot.getKey();
                 if(user == null){
                     callback.failure();
                 }else{
@@ -130,6 +131,18 @@ public class DatabaseUtils {
 
             }
         });
+    }
+
+    /**
+     * Create a new playlist and return its id
+     * @return
+     */
+    public static String createPlaylist() {
+        JuiceboxPlaylist juiceboxPlaylist = new JuiceboxPlaylist();
+        DatabaseReference ref = getDatabase().child(playlistEndpoint).push();
+        juiceboxPlaylist.id = ref.getKey();
+        ref.setValue(juiceboxPlaylist);
+        return juiceboxPlaylist.id;
     }
 
     public static abstract class DatabaseCallback<T>{
