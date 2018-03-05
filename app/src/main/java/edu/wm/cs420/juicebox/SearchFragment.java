@@ -1,7 +1,6 @@
 package edu.wm.cs420.juicebox;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 
 import android.os.Handler;
@@ -12,20 +11,15 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.List;
 
-import kaaes.spotify.webapi.android.SpotifyApi;
-import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.TracksPager;
 import retrofit.Callback;
@@ -134,7 +128,7 @@ public class SearchFragment extends Fragment {
         mRecyclerView = getView().findViewById(R.id.song_results);
         mLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new SearchFragmentAdapter();
+        mAdapter = new SearchFragmentAdapter(SearchFragmentAdapter.ViewType.SEARCH);
         mRecyclerView.setAdapter(mAdapter);
         // searchButton = getView().findViewById(R.id.search_button);
         // lv = view.findViewById(R.id.search_results);
@@ -199,7 +193,7 @@ public class SearchFragment extends Fragment {
             @Override
             public void success(TracksPager tracksPager, Response response) {
                 List<Track> trackList = tracksPager.tracks.items;
-                ((SearchFragmentAdapter) mAdapter).setResults(trackList);
+                ((SearchFragmentAdapter) mAdapter).setData(trackList);
                 mAdapter.notifyDataSetChanged();
                 Log.d(TAG, "success: HELLO");
 //                       lv.setAdapter(new SearchFragmentAdapter(getContext(), trackList,
