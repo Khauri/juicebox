@@ -4,14 +4,23 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -33,7 +42,7 @@ import retrofit.client.Response;
  * create an instance of this fragment.
  */
 public class SearchFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
+    private static String TAG = "juicebox-searchfragment";
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -42,9 +51,14 @@ public class SearchFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
     private OnAddToQueueListener queueListener;
 
     private EditText searchBar;
+    private Handler searchTimer = new Handler();
     private Button searchButton;
     private ListView lv;
 
@@ -53,11 +67,7 @@ public class SearchFragment extends Fragment {
     }
 
     /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment SearchFragment.
      */
     // TODO: Rename and change types and number of parameters
@@ -83,38 +93,75 @@ public class SearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_search, container, false);
+        return inflater.inflate(R.layout.fragment_search2, container, false);
+        //return inflater.inflate(R.layout.fragment_search, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState){
         searchBar = getView().findViewById(R.id.search_bar);
-        searchButton = getView().findViewById(R.id.search_button);
-        lv = view.findViewById(R.id.search_results);
-        searchButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-               String searchQuery = searchBar.getText().toString();
-               SpotifyApi api = SpotifyUtils.getSpotifyApi();
-               SpotifyService service = api.getService();
+        // watchtches for
+        searchBar.addTextChangedListener(
+            new TextWatcher() {
+                private String searchQuery;
+                private Runnable delaySearch = new Runnable() {
+                    @Override
+                    public void run() {
+                        if(TextUtils.isEmpty(searchQuery))
+                            return;
+                        performSearch(searchQuery);
+                    }
+                };
 
-               service.searchTracks(searchQuery, new Callback<TracksPager>(){
-                   @Override
-                   public void success(TracksPager trackPager, Response reponse){
-                       List<Track> trackList = trackPager.tracks.items;
-                       lv.setAdapter(new SearchFragmentAdapter(getContext(), trackList,
-                               SearchFragment.this));
-                   }
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                   @Override
-                   public void failure(RetrofitError error){
-                       Log.d("RetrofitError", error.getMessage());
-                   }
-               });
+                }
 
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    searchQuery = editable.toString();
+                    searchTimer.removeCallbacks(delaySearch);
+                    searchTimer.postDelayed(delaySearch, 250);
+                }
             }
-        });
+        );
+        mRecyclerView = getView().findViewById(R.id.song_results);
+        mLayoutManager = new LinearLayoutManager(getContext());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new SearchFragmentAdapter();
+        mRecyclerView.setAdapter(mAdapter);
+        // searchButton = getView().findViewById(R.id.search_button);
+        // lv = view.findViewById(R.id.search_results);
+//        searchButton.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View view){
+//               String searchQuery = searchBar.getText().toString();
+//               SpotifyApi api = SpotifyUtils.getSpotifyApi();
+//               SpotifyService service = api.getService();
+//
+//               service.searchTracks(searchQuery, new Callback<TracksPager>(){
+//                   @Override
+//                   public void success(TracksPager trackPager, Response reponse){
+//                       List<Track> trackList = trackPager.tracks.items;
+//                       lv.setAdapter(new SearchFragmentAdapter(getContext(), trackList,
+//                               SearchFragment.this));
+//                   }
+//
+//                   @Override
+//                   public void failure(RetrofitError error){
+//                       Log.d("RetrofitError", error.getMessage());
+//                   }
+//               });
+//
+//
+//            }
+//        });
     }
 
 
@@ -136,14 +183,7 @@ public class SearchFragment extends Fragment {
     }
 
     /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
+     *
      */
     public interface OnAddToQueueListener {
         // TODO: Update argument type and name
@@ -152,6 +192,25 @@ public class SearchFragment extends Fragment {
 
     public OnAddToQueueListener getListener(){
         return queueListener;
+    }
+
+    public void performSearch(String searcQuery){
+        SpotifyUtils.getSpotifyService().searchTracks(searcQuery, new Callback<TracksPager>() {
+            @Override
+            public void success(TracksPager tracksPager, Response response) {
+                List<Track> trackList = tracksPager.tracks.items;
+                ((SearchFragmentAdapter) mAdapter).setResults(trackList);
+                mAdapter.notifyDataSetChanged();
+                Log.d(TAG, "success: HELLO");
+//                       lv.setAdapter(new SearchFragmentAdapter(getContext(), trackList,
+//                               SearchFragment.this));
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d(TAG, "performSearch/searchTracks/failure: " + error.getMessage());
+            }
+        });
     }
 
 }

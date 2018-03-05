@@ -18,6 +18,7 @@ import com.spotify.sdk.android.player.Error;
 import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.SpotifyPlayer;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -37,6 +38,7 @@ public class MainActivity
         SpotifyPlayer.NotificationCallback {
 
     private String TAG = "Juicebox-MainActivity";
+    public Picasso picasso;
 
     private static final int NUM_ITEMS = 3;
 
@@ -96,9 +98,8 @@ public class MainActivity
             }
         });
         mPager.setCurrentItem(1);
-
         //
-        getAlbum();
+        // getAlbum();
         //DatabaseUtils.createParty();
     }
 

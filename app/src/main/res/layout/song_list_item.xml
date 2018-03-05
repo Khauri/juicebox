@@ -1,12 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="15dp"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:longClickable="true"
+    android:orientation="horizontal"
+    android:paddingBottom="5dp"
+    android:paddingTop="5dp">
 
-    <TextView
-        android:id="@+id/titleTextView"
-        android:layout_width="wrap_content"
+    <ImageView
+        android:id="@+id/track_album_img"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginRight="10dp"
+        android:layout_weight="0"
+        android:background="@android:color/transparent"
+        app:srcCompat="@drawable/ic_library_music_black_24dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="TextView" />
+        android:baselineAligned="false"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/track_name_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="TextView"
+            android:textColor="@color/colorAccentGreen"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/track_artists_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="TextView"
+                android:textColor="@color/colorGrey" />
+
+            <TextView
+                android:id="@+id/track_duration_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="5dp"
+                android:singleLine="true"
+                android:text="TextView"
+                android:textColor="@color/colorGrey" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="40dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0"
+        android:background="@android:color/transparent"
+        app:srcCompat="@drawable/ic_more_vert_black_24dp" />
+
 </LinearLayout>
