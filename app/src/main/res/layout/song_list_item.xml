@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="20dp"
-    android:layout_marginRight="15dp"
+    android:layout_marginStart="20dp"
+    android:layout_marginEnd="15dp"
     android:background="?attr/selectableItemBackground"
     android:clickable="true"
     android:foreground="?attr/selectableItemBackground"
@@ -18,10 +18,10 @@
         android:id="@+id/track_album_img"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
         android:layout_weight="0"
         android:background="@android:color/transparent"
-        app:srcCompat="@drawable/ic_library_music_black_24dp" />
+        app:srcCompat="@drawable/ic_library_music_black_24dp" android:contentDescription="TODO"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,7 +38,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:singleLine="true"
-            android:text="TextView"
+            android:text="@string/track_name"
             android:textColor="@color/colorAccentGreen"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -46,7 +46,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0"
             android:orientation="horizontal">
 
             <TextView
@@ -56,7 +56,7 @@
                 android:layout_weight="0"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:text="TextView"
+                android:text="@string/track_artists"
                 android:textColor="@color/colorGrey" />
 
             <TextView
@@ -64,20 +64,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:paddingLeft="5dp"
+                android:paddingStart="5dp"
                 android:singleLine="true"
-                android:text="TextView"
+                android:text="@string/track_duration"
                 android:textColor="@color/colorGrey" />
         </LinearLayout>
 
     </LinearLayout>
 
     <ImageButton
-        android:id="@+id/imageButton"
+        android:id="@+id/context_menu_btn"
         android:layout_width="40dp"
         android:layout_height="match_parent"
         android:layout_weight="0"
         android:background="@android:color/transparent"
-        app:srcCompat="@drawable/ic_more_vert_black_24dp" />
+        app:srcCompat="@drawable/ic_more_vert_black_24dp" android:contentDescription="TODO"/>
 
 </LinearLayout>

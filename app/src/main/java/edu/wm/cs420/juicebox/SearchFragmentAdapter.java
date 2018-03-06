@@ -7,7 +7,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -56,10 +58,11 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
      * A Viewholder for the search items
      */
     public static class SearchItemHolder extends myViewHolder<Track>{
-        private TextView track_name;
-        private TextView track_artists;
-        private TextView track_duration;
-        private ImageView track_album_img;
+        private TextView    track_name;
+        private TextView    track_artists;
+        private TextView    track_duration;
+        private ImageView   track_album_img;
+        private ImageButton context_menu_btn;
 
         public SearchItemHolder(View itemView) {
             super(itemView);
@@ -67,6 +70,23 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             track_artists = itemView.findViewById(R.id.track_artists_text);
             track_duration = itemView.findViewById(R.id.track_duration_text);
             track_album_img = itemView.findViewById(R.id.track_album_img);
+            context_menu_btn = itemView.findViewById(R.id.context_menu_btn);
+            // TODO: Perform some action (potentially the same actions) on these events
+            // Long press on the view itself
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    Log.d(TAG, "searchItemHolder/onLongClick");
+                    return true;
+                }
+            });
+            // press the context menu button
+            context_menu_btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.d(TAG, "searchItemHolder/onClick");
+                }
+            });
         }
 
         @Override
@@ -112,10 +132,12 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             track_artists = itemView.findViewById(R.id.track_artists_text);
             track_duration = itemView.findViewById(R.id.track_duration_text);
             track_album_img = itemView.findViewById(R.id.track_album_img);
+            reputation_count = itemView.findViewById(R.id.track_requester_text);
+            requester_name = itemView.findViewById(R.id.track_requester_text);
         }
 
         public void bindData(final JuiceboxTrack track) {
-//            track_name.setText(track.name);
+            track_name.setText(track.track_name);
 //            // Combine the artists
 //            final StringJoiner joiner = new StringJoiner(", ");
 //            track.artists.forEach(new Consumer<ArtistSimple>() {
@@ -124,8 +146,8 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 //                    joiner.add(artistSimple.name);
 //                }
 //            });
-//            track_artists.setText(joiner.toString());
-//            track_duration.setText(DateUtils.formatElapsedTime(track.duration_ms / 1000));
+            track_artists.setText(track.track_artists);
+            track_duration.setText(DateUtils.formatElapsedTime(track.duration / 1000));
 //            if(track.album.images.size() > 0)
 //                Picasso.with(context).load(track.album.images.get(0).url).into(track_album_img);
         }
@@ -136,7 +158,7 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         this.data = new ArrayList<>();
     }
 
-    public SearchFragmentAdapter(ViewType viewType, List<Object> tracks){
+    public SearchFragmentAdapter(ViewType viewType, List<?> tracks){
         this.viewType = viewType;
         this.data = tracks;
     }
@@ -163,6 +185,7 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         // do not remove the following line unless you like lint warnings
         //noinspection unchecked
         ((myViewHolder) holder).bindData(data.get(position));
+        setFadeAnimation(holder.itemView);
     }
 
 
@@ -181,6 +204,12 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             default:
                 return 0;
         }
+    }
+
+    public void setFadeAnimation(View view) {
+        AlphaAnimation anim = new AlphaAnimation(0.0f, 1.0f);
+        anim.setDuration(500);
+        view.startAnimation(anim);
     }
 
 //    public class ViewHolder {

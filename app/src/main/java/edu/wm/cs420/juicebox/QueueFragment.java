@@ -6,6 +6,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +21,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.wm.cs420.juicebox.database.models.JuiceboxTrack;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,7 +32,7 @@ import java.util.List;
  * Use the {@link QueueFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class QueueFragment extends ListFragment implements AdapterView.OnItemClickListener {
+public class QueueFragment extends Fragment implements AdapterView.OnItemClickListener {
     private static String TAG = "juicebox-QueueFragment";
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -43,6 +47,10 @@ public class QueueFragment extends ListFragment implements AdapterView.OnItemCli
     private List<SongListItem> songList;
 
     private ListView lv;
+    // For displaying the queue
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     private QueueFragmentAdapter adapter;
     private Button btnNewParty;
@@ -73,8 +81,8 @@ public class QueueFragment extends ListFragment implements AdapterView.OnItemCli
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        songList = new ArrayList();
-        adapter = new QueueFragmentAdapter(getActivity(), songList);
+//        songList = new ArrayList();
+//        adapter = new QueueFragmentAdapter(getActivity(), songList);
 
     }
 
@@ -84,8 +92,8 @@ public class QueueFragment extends ListFragment implements AdapterView.OnItemCli
         // Inflate the layout for this fragment
         Log.d("onCreateView", "onCreateView called");
         View view = inflater.inflate(R.layout.fragment_queue, container, false);
-        adapter = new QueueFragmentAdapter(getActivity(), songList);
-        setListAdapter(adapter);
+//        adapter = new QueueFragmentAdapter(getActivity(), songList);
+//        setListAdapter(adapter);
         return view;
     }
 
@@ -101,14 +109,31 @@ public class QueueFragment extends ListFragment implements AdapterView.OnItemCli
                 startActivity(intent);
             }
         });
+        mRecyclerView = getView().findViewById(R.id.song_results);
+        mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        // Create some fake data for testing purposes
+        List<JuiceboxTrack> tracks = new ArrayList<>();
+        for(int i = 0; i < 10; i++){
+            JuiceboxTrack jbt = new JuiceboxTrack();
+            jbt.album_name = "TEST TEST TEST";
+            jbt.track_artists = "p, pyself, Pi";
+            jbt.track_name  = "TEST SONG TEST";
+            jbt.duration    = 60 * 3 * 1000;
+            jbt.reputation = 10;
+            tracks.add(jbt);
+        }
+
+        mAdapter = new SearchFragmentAdapter(SearchFragmentAdapter.ViewType.BIG_QUEUE, tracks);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     @Override
     public void onResume(){
         super.onResume();
         Log.d("OnResume", "onResume() called!");
-        adapter = new QueueFragmentAdapter(getActivity(), songList);
-        setListAdapter(adapter);
+//        adapter = new QueueFragmentAdapter(getActivity(), songList);
+//        setListAdapter(adapter);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -152,24 +177,24 @@ public class QueueFragment extends ListFragment implements AdapterView.OnItemCli
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-        SongListItem item = this.songList.get(position);
-        Toast.makeText(getActivity(), item.getName() + " Clicked!", Toast.LENGTH_SHORT).show();
+//        SongListItem item = this.songList.get(position);
+//        Toast.makeText(getActivity(), item.getName() + " Clicked!", Toast.LENGTH_SHORT).show();
     }
 
     //following two methods help us save the state of the fragment
     @Override
     public void onSaveInstanceState(final Bundle outstate){
         super.onSaveInstanceState(outstate);
-        outstate.putSerializable("list", (Serializable) songList);
+        //outstate.putSerializable("list", (Serializable) songList);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
 
-        if (savedInstanceState != null){
-            songList = (List<SongListItem>) savedInstanceState.getSerializable("list");
-        }
+//        if (savedInstanceState != null){
+//            songList = (List<SongListItem>) savedInstanceState.getSerializable("list");
+//        }
         //everything should be fine here...
     }
 
@@ -182,9 +207,9 @@ public class QueueFragment extends ListFragment implements AdapterView.OnItemCli
     }
 
     public void updateQueue(SongListItem song){
-        Log.d("updateQueue", "updateQueue called!");
-        songList.add(song);
-        adapter = new QueueFragmentAdapter(getActivity(), songList);
-        setListAdapter(adapter);
+//        Log.d("updateQueue", "updateQueue called!");
+//        songList.add(song);
+//        adapter = new QueueFragmentAdapter(getActivity(), songList);
+//        setListAdapter(adapter);
     }
 }

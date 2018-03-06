@@ -20,9 +20,10 @@ public class JuiceboxTrack {
     public int      reputation;     // the song's reputation
 
     // cached information about the song
-    public String   album_title;
-    public String   song_artist;
-    public String   song_title;
+    public String   album_name;
+    public String   track_artists;
+    public String   track_name;
+    public String   album_img;
     public long     duration;
 
     public JuiceboxTrack(){
@@ -30,9 +31,9 @@ public class JuiceboxTrack {
     }
 
     public JuiceboxTrack(Track track) {
-        this.album_title = track.album.name;
-        this.song_artist = track.artists.get(0).name;
-        this.song_title  = track.name;
+        this.album_name = track.album.name;
+        this.track_artists = track.artists.get(0).name;
+        this.track_name  = track.name;
         this.duration    = track.duration_ms;
         this.spotify_id  = track.id;
     }
