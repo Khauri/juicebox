@@ -1,12 +1,20 @@
 package edu.wm.cs420.juicebox;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
@@ -32,12 +40,16 @@ public class EntryActivity extends AppCompatActivity
     // Spotify stuff
     private static final int REQUEST_CODE = 1337;
     private String accessToken;
+    double latitude;
+    double longitude;
+    private FusedLocationProviderClient mFusedLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry);
-
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        getLocation();
         Button signInButton = (Button) findViewById(R.id.button);
         signInButton.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -47,6 +59,31 @@ public class EntryActivity extends AppCompatActivity
         });
     }
 
+    public void getLocation(){
+        Log.d("check","got here2");
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                ){//Can add more as per requirement
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                    123);
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            Log.d("check","got here4");
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                latitude = location.getLatitude();
+                                longitude = location.getLongitude();
+                                Log.d("location", "latitude is" + latitude + ", longitude is" + longitude);
+                            }
+                        }
+                    });
+        }
+        Log.d("tag","got here3");
+    }
     private void initiateLoginScreen(){
         // Authentifications
         AuthenticationRequest.Builder builder;

@@ -1,6 +1,9 @@
 package edu.wm.cs420.juicebox;
 
+import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,22 +11,29 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.GeofencingApi;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.spotify.sdk.android.player.Error;
 import com.spotify.sdk.android.player.Player;
 import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.SpotifyPlayer;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
-import edu.wm.cs420.juicebox.database.DatabaseUtils;
 import kaaes.spotify.webapi.android.models.Pager;
 import kaaes.spotify.webapi.android.models.PlaylistSimple;
 import retrofit.Callback;
@@ -38,7 +48,6 @@ public class MainActivity
         SpotifyPlayer.NotificationCallback {
 
     private String TAG = "Juicebox-MainActivity";
-    public Picasso picasso;
 
     private static final int NUM_ITEMS = 3;
 
@@ -49,6 +58,10 @@ public class MainActivity
     private static final int REQUEST_CODE = 1337;
     private Player mPlayer;
     private String accessToken;
+    private GeofencingClient mGeofencingClient;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private double longitude;
+    private double latitude;
 
     private static QueueFragment queueFragment;
     private static SearchFragment searchFragment;
@@ -78,7 +91,6 @@ public class MainActivity
 
         // change menu item on scroll
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            private MenuItem prevItem;
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 // Do nothing
@@ -86,10 +98,8 @@ public class MainActivity
 
             @Override
             public void onPageSelected(int position) {
-                if(prevItem != null)
-                    prevItem.setChecked(false);
-                bottomNavigationView.getMenu().getItem(position).setChecked(true);
-                prevItem = bottomNavigationView.getMenu().getItem(position);
+                // change selected menu item
+                // be careful of recursive accidents
             }
 
             @Override
@@ -98,10 +108,41 @@ public class MainActivity
             }
         });
         mPager.setCurrentItem(1);
+
         //
-        // getAlbum();
-        //DatabaseUtils.createParty();
+        mGeofencingClient = LocationServices.getGeofencingClient(this);
+//        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+//        //getLocation();
+//        try{
+//            mFusedLocationClient.getLastLocation()
+//                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+//                        @Override
+//                        public void onSuccess(Location location) {
+//                            if (location != null) {
+//                                latitude = location.getLatitude();
+//                                longitude = location.getLongitude();
+//                                Log.d("location", "latitude is" + latitude + ", longitude is" + longitude);
+//                                Geofence fence = new Geofence.Builder().setCircularRegion(latitude,longitude,100).build();
+//                                // Got last known location. In some rare situations this can be null.
+//                                // Logic to handle location object
+//                            }
+//                            else{
+//                                Geofence fence = new Geofence.Builder().setCircularRegion(37.4220,-122.0840,100).build();
+//                            }
+//                        }
+//                    });
+//        } catch (SecurityException e) {
+//
+//        } catch (Exception e) {
+//
+//        }
+
+
+        //getAlbum();
     }
+
+    //public void getLocation(){
+    //}
 
     public void getAlbum(){
         Log.d(TAG, "getAlbum: Retrieving my playlists");
@@ -125,7 +166,7 @@ public class MainActivity
 
             }
         });
-}
+    }
 
 
     @Override
@@ -186,7 +227,7 @@ public class MainActivity
         }
     }
 
-    public static class MyAdapter extends FragmentStatePagerAdapter {
+    public static class MyAdapter extends FragmentPagerAdapter {
         public MyAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -218,4 +259,6 @@ public class MainActivity
             return NUM_ITEMS;
         }
     }
+
+
 }
