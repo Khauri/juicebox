@@ -149,7 +149,8 @@ public class QueueFragment extends Fragment implements AdapterView.OnItemClickLi
         }else{
             queue_screen.setVisibility(View.GONE);
             start_screen.setVisibility(View.VISIBLE);
-            playback_controls.setVisibility(View.GONE);
+            playback_controls.setVisibility(View.VISIBLE);
+//            playback_controls.setVisibility(View.GONE);
         }
     }
 

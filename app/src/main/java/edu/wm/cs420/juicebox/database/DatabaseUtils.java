@@ -2,6 +2,7 @@ package edu.wm.cs420.juicebox.database;
 
 import android.util.Log;
 
+import com.firebase.geofire.GeoFire;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,15 +27,25 @@ public class DatabaseUtils {
     private static String TAG = "Juicebox-DatabaseUtils";
 
     private static DatabaseReference mDatabase;
+    private static GeoFire mGeofire;
+
     public static String usersEndpoint = "users/";
     public static String partyEndpoint = "parties/";
     public static String playlistEndpoint = "playlists/";
+    public static String geofireEndpoint = "geofire/";
 
     public static DatabaseReference getDatabase(){
         if(mDatabase == null){
             mDatabase = FirebaseDatabase.getInstance().getReference();
         }
         return mDatabase;
+    }
+
+    public static GeoFire getGeoFire(){
+        if(mGeofire == null){
+            mGeofire = new GeoFire(getDatabase().child(geofireEndpoint));
+        }
+        return mGeofire;
     }
 
     public static JuiceboxParty createParty(String hostId, String partyName, String partyDesc, String latLong, int radius, int privacy){
@@ -100,7 +111,8 @@ public class DatabaseUtils {
                 if(user == null){
                     callback.failure();
                 }else{
-                    user.id = dataSnapshot.getKey();
+                    for(DataSnapshot snapshot : dataSnapshot.getChildren())
+                        user.id = snapshot.getKey();
                     callback.success(user);
                 }
             }

@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import edu.wm.cs420.juicebox.user.UserUtils;
 import kaaes.spotify.webapi.android.models.Pager;
 import kaaes.spotify.webapi.android.models.PlaylistSimple;
 import retrofit.Callback;
@@ -129,33 +130,6 @@ public class MainActivity
         mGeofencingClient = LocationServices.getGeofencingClient(this);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         requestPermissions();
-//        getLocation();
-//        try{
-//            mFusedLocationClient.getLastLocation()
-//                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-//                        @Override
-//                        public void onSuccess(Location location) {
-//                            if (location != null) {
-//                                latitude = location.getLatitude();
-//                                longitude = location.getLongitude();
-//                                Log.d("location", "latitude is" + latitude + ", longitude is" + longitude);
-//                                Geofence fence = new Geofence.Builder().setCircularRegion(latitude,longitude,100).build();
-//                                // Got last known location. In some rare situations this can be null.
-//                                // Logic to handle location object
-//                            }
-//                            else{
-//                                Geofence fence = new Geofence.Builder().setCircularRegion(37.4220,-122.0840,100).build();
-//                            }
-//                        }
-//                    });
-//        } catch (SecurityException e) {
-//
-//        } catch (Exception e) {
-//
-//        }
-
-
-        //getAlbum();
     }
     //public void requestPermissions (Activity activity, String[] permissions, int requestCode){
     public void requestPermissions () {
@@ -167,42 +141,41 @@ public class MainActivity
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},
                     123);
 
-        }else{
-        // Create the location request to start receiving updates
-        locationRequest = new LocationRequest();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(10000);
+        } else {
+            // Create the location request to start receiving updates
+            locationRequest = new LocationRequest();
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            locationRequest.setInterval(10000);
 
-        // Create LocationSettingsRequest object using location request
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
-        builder.addLocationRequest(locationRequest);
-        LocationSettingsRequest locationSettingsRequest = builder.build();
+            // Create LocationSettingsRequest object using location request
+            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+            builder.addLocationRequest(locationRequest);
+            LocationSettingsRequest locationSettingsRequest = builder.build();
 
-        // Check whether location settings are satisfied
-        SettingsClient settingsClient = LocationServices.getSettingsClient(this);
-        settingsClient.checkLocationSettings(locationSettingsRequest);
+            // Check whether location settings are satisfied
+            SettingsClient settingsClient = LocationServices.getSettingsClient(this);
+            settingsClient.checkLocationSettings(locationSettingsRequest);
 
-        //if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-        //    return;
-        //}
-        getFusedLocationProviderClient(this).requestLocationUpdates(locationRequest, new LocationCallback() {
-                    @Override
-                    public void onLocationResult(LocationResult locationResult) {
-                        latitude = locationResult.getLastLocation().getLatitude();
-                        longitude = locationResult.getLastLocation().getLongitude();
-                        Toast.makeText(MainActivity.this, "longitude is " + longitude + ", latitude is " + latitude, Toast.LENGTH_SHORT).show();
-                        onLocationChanged(locationResult.getLastLocation(), false);
-                    }
-                },
-                Looper.myLooper());}
+            getFusedLocationProviderClient(this)
+                    .requestLocationUpdates(locationRequest, new LocationCallback() {
+                        @Override
+                        public void onLocationResult(LocationResult locationResult) {
+                            latitude = locationResult.getLastLocation().getLatitude();
+                            longitude = locationResult.getLastLocation().getLongitude();
+                            Toast.makeText(MainActivity.this, "longitude is " + longitude + ", latitude is " + latitude, Toast.LENGTH_SHORT).show();
+                            onLocationChanged(locationResult.getLastLocation(), false);
+                        }
+                    }, Looper.myLooper());
+        }
     }
 
     public void onLocationChanged(Location location, boolean forceUpdate) {
-        long currentTime = System.currentTimeMillis();
-        if (forceUpdate || currentTime - lastUpdatedTime > 10000) {
-            //Log.d("TIMES", currentTime + " " + lastUpdatedTime + " " + (currentTime - lastUpdatedTime));
-            lastUpdatedTime = currentTime;
-        }
+        UserUtils.setLocation(location);
+//        long currentTime = System.currentTimeMillis();
+//        if (forceUpdate || currentTime - lastUpdatedTime > 10000) {
+//            //Log.d("TIMES", currentTime + " " + lastUpdatedTime + " " + (currentTime - lastUpdatedTime));
+//            lastUpdatedTime = currentTime;
+//        }
     }
 
     @Override
@@ -227,16 +200,16 @@ public class MainActivity
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        getFusedLocationProviderClient(this).requestLocationUpdates(locationRequest, new LocationCallback() {
+        getFusedLocationProviderClient(this)
+                .requestLocationUpdates(locationRequest, new LocationCallback() {
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
                         onLocationChanged(locationResult.getLastLocation(), false);
-                        latitude = locationResult.getLastLocation().getLatitude();
-                        longitude = locationResult.getLastLocation().getLongitude();
-                        Toast.makeText(MainActivity.this, "longitude is " + longitude + ", latitude is " + latitude, Toast.LENGTH_SHORT).show();
+//                        latitude = locationResult.getLastLocation().getLatitude();
+//                        longitude = locationResult.getLastLocation().getLongitude();
+//                        Toast.makeText(MainActivity.this, "longitude is " + longitude + ", latitude is " + latitude, Toast.LENGTH_SHORT).show();
                     }
-                },
-                Looper.myLooper());
+                }, Looper.myLooper());
 
     }
 

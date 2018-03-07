@@ -16,10 +16,7 @@ import com.squareup.picasso.Picasso;
 import java.text.NumberFormat;
 
 import edu.wm.cs420.juicebox.database.models.JuiceboxUser;
-import edu.wm.cs420.juicebox.user.UserUpdateListener;
 import edu.wm.cs420.juicebox.user.UserUtils;
-
-import static android.content.ContentValues.TAG;
 
 
 /**

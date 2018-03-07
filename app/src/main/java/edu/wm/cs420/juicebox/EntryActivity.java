@@ -80,20 +80,20 @@ public class EntryActivity extends AppCompatActivity
 
     //public void requestPermissions (Activity activity, String[] permissions, int requestCode){
     public void requestPermissions (){
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                ){//Can add more as per requirement
-            //Toast.makeText(activity, "yes", Toast.LENGTH_SHORT).show();
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},
-                    123);
-
-        }
-        else{
-            mLocationRequest = LocationRequest.create()
-                            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                            .setInterval(10000);
-        Toast.makeText(EntryActivity.this, "no", Toast.LENGTH_SHORT).show();}
+//        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+//                ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+//                ){//Can add more as per requirement
+//            //Toast.makeText(activity, "yes", Toast.LENGTH_SHORT).show();
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},
+//                    123);
+//
+//        }
+//        else{
+//            mLocationRequest = LocationRequest.create()
+//                            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+//                            .setInterval(10000);
+//        Toast.makeText(EntryActivity.this, "no", Toast.LENGTH_SHORT).show();}
 //        ActivityCompat.requestPermissions(this,
 //                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},
 //                123);
@@ -187,7 +187,6 @@ public class EntryActivity extends AppCompatActivity
     }
 
     private void openMainActivity(){
-
         Intent nextActivity = new Intent(getBaseContext(), MainActivity.class);
         //give the access token to the next activity so that we can make API calls
         nextActivity.putExtra("token", accessToken);

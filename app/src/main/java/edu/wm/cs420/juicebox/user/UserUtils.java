@@ -2,9 +2,13 @@ package edu.wm.cs420.juicebox.user;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -35,14 +39,50 @@ import retrofit.client.Response;
 
 public class UserUtils {
     private static  String TAG = "UserUtils";
-
-    private static String user_id;
-    private static String party_id;
-    private static String playlist_id;
-
     private enum    EVENT_TYPES {UserUpdated, PlaylistUpdated};
+
+    private static Location location;
     private static  JuiceboxUser user;
     private static  JuiceboxParty party;
+    private static GeoQuery geoQuery;
+
+    private UserUtils(){};
+
+    public static void setLocation(Location location) {
+        if(geoQuery == null){
+            geoQuery = DatabaseUtils.getGeoFire()
+                    .queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 0.001);
+            geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+                @Override
+                public void onKeyEntered(String key, GeoLocation location) {
+                }
+                @Override
+                public void onKeyExited(String key) {
+
+                }
+                @Override
+                public void onKeyMoved(String key, GeoLocation location) {
+
+                }
+                @Override
+                public void onGeoQueryReady() {
+                }
+                @Override
+                public void onGeoQueryError(DatabaseError error) {
+                }
+            });
+        }else{
+            double radius = UserUtils.isInParty() ? party.radius / 1000 : 0.001;
+            geoQuery.setLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), radius);
+        }
+    }
+
+    public static Location getLocation(){
+        if(location == null){
+            // Try to get the location of the user
+        }
+        return location;
+    }
 
     private static List<?> listeners2 = new ArrayList<>();
 
@@ -116,6 +156,8 @@ public class UserUtils {
             callback.onFailure(UserUtilsCallback.ERROR.NO_USER, "User was not initialized");
             return;
         }
+        Log.d(TAG, "hostParty: " + user.id);
+        juiceboxParty.host_id = user.id;
         // add the party to the database
         DatabaseUtils.createParty(juiceboxParty);
         setParty(juiceboxParty);
@@ -177,6 +219,8 @@ public class UserUtils {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         user = dataSnapshot.getValue(JuiceboxUser.class);
+                        for(DataSnapshot snapshot : dataSnapshot.getChildren())
+                            user.id = snapshot.getKey();
                         update("user", EVENT_TYPES.UserUpdated, user);
                     }
 
