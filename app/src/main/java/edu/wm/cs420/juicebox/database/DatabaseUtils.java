@@ -100,6 +100,7 @@ public class DatabaseUtils {
                 if(user == null){
                     callback.failure();
                 }else{
+                    user.id = dataSnapshot.getKey();
                     callback.success(user);
                 }
             }

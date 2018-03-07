@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -61,12 +62,18 @@ public class EntryActivity extends AppCompatActivity
        // requestPermissions();
         //Toast.makeText(EntryActivity.this, "latitude is" + latitude + ", longitude is" + longitude, Toast.LENGTH_SHORT).show();
         //Log.d("location", "latitude is" + latitude + ", longitude is" + longitude);
-        Button signInButton = (Button) findViewById(R.id.button);
+        Button signInButton = findViewById(R.id.button);
         signInButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v){
+                //openMainActivity();
+                initiateLoginScreen();
+            }
+        });
+        findViewById(R.id.skip_sign_in_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 openMainActivity();
-                //initiateLoginScreen();
             }
         });
     }
