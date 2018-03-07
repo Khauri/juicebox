@@ -48,6 +48,7 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     /**
      * A base class viewholder implementation so that this adapter can be re-used
      * a little easier given its bindData method.
+     * TODO: Something to consider is data binding, but it's a little too late for that
      * @param <T>
      */
     public static abstract class myViewHolder<T> extends RecyclerView.ViewHolder{
@@ -68,7 +69,8 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         private ImageButton context_menu_btn;
 
         private void addTrack(Context context, Track track){
-            // TODO: Open a dialogue menu with options
+            // TODO: Open a dialogue menu with options.
+            // add the track to user's current party
             if(UserUtils.isInParty()) {
                 // Simply adds this track to the party
                 UserUtils.addTrackToCurrentParty(track.id, new UserUtils.UserUtilsCallback() {
@@ -81,8 +83,7 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     public void onFailure(ERROR E, String error) {
                     }
                 });
-            }
-            else {
+            } else {
                 // Opens up a new intent allowing the creation of a party
                 UserUtils.createPartyWithTrack(context, track);
             }
@@ -142,7 +143,9 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
      * A Viewholder for the queue items
      */
     public static class QueueItemHolder extends myViewHolder<JuiceboxTrack>{
-        // TODO: Depending on how the layout pans out this info might have to be exported somehow
+        // User info
+        private ImageView   user_img;
+        private TextView    requester_name;
         // Track info
         private TextView    track_name;
         private TextView    track_artists;
@@ -150,7 +153,6 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         private ImageView   track_album_img;
         // Meta data
         private TextView    reputation_count;
-        private TextView    requester_name;
         // Controls(?)
         private Button      upvote_btn;
         private Button      downvote_btn;
@@ -162,6 +164,8 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             track_album_img = itemView.findViewById(R.id.track_album_img);
             reputation_count = itemView.findViewById(R.id.track_requester_text);
             requester_name = itemView.findViewById(R.id.track_requester_text);
+            reputation_count = itemView.findViewById(R.id.track_requester_text);
+            user_img = itemView.findViewById(R.id.track_album_img);
         }
 
         public void bindData(final JuiceboxTrack track) {
@@ -176,9 +180,11 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 //            });
             track_artists.setText(track.track_artists);
             track_duration.setText(DateUtils.formatElapsedTime(track.duration / 1000));
+            requester_name.setText(track.user_name);
+            reputation_count.setText(track.reputation);
+
+            // load album img
             Picasso.with(context).load(track.album_img).into(track_album_img);
-//            if(track.album.images.size() > 0)
-//                Picasso.with(context).load(track.album.images.get(0).url).into(track_album_img);
         }
     }
 

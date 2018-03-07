@@ -16,7 +16,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -52,6 +55,8 @@ public class SearchFragment extends Fragment {
     private OnAddToQueueListener queueListener;
 
     private EditText searchBar;
+    private TextView searchHintText;
+    private ProgressBar progressBar;
     private Handler searchTimer = new Handler();
     private Button searchButton;
     private ListView lv;
@@ -130,32 +135,8 @@ public class SearchFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new SearchFragmentAdapter(SearchFragmentAdapter.ViewType.SEARCH);
         mRecyclerView.setAdapter(mAdapter);
-        // searchButton = getView().findViewById(R.id.search_button);
-        // lv = view.findViewById(R.id.search_results);
-//        searchButton.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View view){
-//               String searchQuery = searchBar.getText().toString();
-//               SpotifyApi api = SpotifyUtils.getSpotifyApi();
-//               SpotifyService service = api.getService();
-//
-//               service.searchTracks(searchQuery, new Callback<TracksPager>(){
-//                   @Override
-//                   public void success(TracksPager trackPager, Response reponse){
-//                       List<Track> trackList = trackPager.tracks.items;
-//                       lv.setAdapter(new SearchFragmentAdapter(getContext(), trackList,
-//                               SearchFragment.this));
-//                   }
-//
-//                   @Override
-//                   public void failure(RetrofitError error){
-//                       Log.d("RetrofitError", error.getMessage());
-//                   }
-//               });
-//
-//
-//            }
-//        });
+        progressBar = getView().findViewById(R.id.search_progress);
+        searchHintText = getView().findViewById(R.id.search_hint_text);
     }
 
 
@@ -188,10 +169,24 @@ public class SearchFragment extends Fragment {
         return queueListener;
     }
 
-    public void performSearch(String searcQuery){
-        SpotifyUtils.getSpotifyService().searchTracks(searcQuery, new Callback<TracksPager>() {
+    public void performSearch(String searchQuery){
+        // user cleared the string
+        if(TextUtils.isEmpty(searchQuery)){
+            searchHintText.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+            return;
+        }
+        // 0. Clear the results?
+        // 1. Hide search hint
+        searchHintText.setVisibility(View.GONE);
+        // 2. display spinner
+        progressBar.setVisibility(View.VISIBLE);
+        // 3. Search for tracks
+        SpotifyUtils.getSpotifyService().searchTracks(searchQuery, new Callback<TracksPager>() {
             @Override
             public void success(TracksPager tracksPager, Response response) {
+                // 4. Remove spinner
+                progressBar.setVisibility(View.GONE);
                 List<Track> trackList = tracksPager.tracks.items;
                 ((SearchFragmentAdapter) mAdapter).setData(trackList);
                 mAdapter.notifyDataSetChanged();

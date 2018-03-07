@@ -1,8 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBlack">
+
+    <FrameLayout
+        android:id="@+id/search_hint_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible">
+
+        <ProgressBar
+            android:id="@+id/search_progress"
+            style="@android:style/Widget.DeviceDefault.Light.ProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/cardview_light_background"
+            android:progressTint="@color/cardview_light_background"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/search_hint_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawableTop="@android:drawable/ic_menu_search"
+            android:text="Search songs, artists, albums, etc."
+            android:textColor="@color/colorGrey"
+            android:textSize="18sp" />
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -37,4 +65,5 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>
