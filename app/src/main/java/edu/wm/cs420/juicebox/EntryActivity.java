@@ -68,19 +68,19 @@ public class EntryActivity extends AppCompatActivity
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},
                     123);
-            mFusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            Log.d("check","got here4");
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                latitude = location.getLatitude();
-                                longitude = location.getLongitude();
-                                Log.d("location", "latitude is" + latitude + ", longitude is" + longitude);
-                            }
-                        }
-                    });
+//            mFusedLocationClient.getLastLocation()
+//                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+//                        @Override
+//                        public void onSuccess(Location location) {
+//                            Log.d("check","got here4");
+//                            // Got last known location. In some rare situations this can be null.
+//                            if (location != null) {
+//                                latitude = location.getLatitude();
+//                                longitude = location.getLongitude();
+//                                Log.d("location", "latitude is" + latitude + ", longitude is" + longitude);
+//                            }
+//                        }
+//                    });
         }
         Log.d("tag","got here3");
     }

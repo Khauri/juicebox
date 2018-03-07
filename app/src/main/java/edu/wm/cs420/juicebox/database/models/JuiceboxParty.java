@@ -31,9 +31,9 @@ public class JuiceboxParty {
     public int radius;                  // The radius around the location
     public int privacy;                 // The privacy setting (0=friendly,1=invite,2=public)
     public long created_at;             // The precise time in ms this party was created at
-    public String pl_id;                // id of party playlist
     public List<String> participants;   // A list of current participants
 
+    public JuiceboxParty(){}
 
     public JuiceboxParty(String hostId, String partyName, String partyDesc, String latLong, int radius, int privacy){
         this.host_id = hostId;

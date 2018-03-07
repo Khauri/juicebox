@@ -19,13 +19,21 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.text.NumberFormat;
+import java.util.HashMap;
 
+import edu.wm.cs420.juicebox.database.DatabaseUtils;
+import edu.wm.cs420.juicebox.database.models.JuiceboxParty;
 import edu.wm.cs420.juicebox.user.UserUtils;
+import kaaes.spotify.webapi.android.SpotifyCallback;
+import kaaes.spotify.webapi.android.SpotifyError;
+import kaaes.spotify.webapi.android.models.Track;
+import retrofit.client.Response;
 
 
 public class NewPartyActivity extends AppCompatActivity {
     private static String TAG = "Juicebox-NewPartyActivity";
 
+    private String track_id;
     private Button btnCreateParty;
     // Party info
     private TextInputLayout tilPartyName;
@@ -40,11 +48,13 @@ public class NewPartyActivity extends AppCompatActivity {
     private RadioGroup rgPrivacySet;
     private int privacy;
 
-    @SuppressLint("SetText")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_party);
+        // Check for a track/playlist/album id passed as an extra
+        this.track_id = getIntent().getStringExtra("track_id");
+
         // Watch party name
         tilPartyName = findViewById(R.id.party_name_input);
         tilPartyName.getEditText().addTextChangedListener(new TextWatcher() {
@@ -157,7 +167,29 @@ public class NewPartyActivity extends AppCompatActivity {
         // TODO: Get the User's Last known location (doesn't have to be a string)
         String latLong = "37.269228,-76.712753"; // Roughly my room in williamsburg
         // create the party
-        UserUtils.hostParty(partyName, partyDesc, latLong, radius, privacy);
-        finish();
+        JuiceboxParty party = new JuiceboxParty();
+        party.name = partyName;
+        party.description = partyDesc;
+        party.location = latLong;
+        party.radius = radius;
+        party.playlist_id = DatabaseUtils.createPlaylist();
+        // Create the party
+        UserUtils.hostParty(party, track_id, new UserUtils.UserUtilsCallback(){
+            @Override
+            public void onSuccess() {
+                Log.d(TAG, "onSuccess: Party Created. Returning!");
+                finish();
+            }
+
+            @Override
+            public void onFailure(ERROR E, String error) {
+                switch(E){
+                    case NO_USER:
+                        Log.d(TAG, "onFailure: " + error);
+                        break;
+                }
+            }
+        });
+        // Here's where we should display some kind of loading progress screen or something
     }
 }

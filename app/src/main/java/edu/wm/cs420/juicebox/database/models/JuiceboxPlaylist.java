@@ -3,6 +3,7 @@ package edu.wm.cs420.juicebox.database.models;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,7 +19,10 @@ public class JuiceboxPlaylist {
 
     public int num_queued = 0;
 
-    public JuiceboxPlaylist(){}
+    public JuiceboxPlaylist(){
+        upcoming_tracks = new ArrayList<>();
+        finished_tracks = new ArrayList<>();
+    }
 
     // Create a playlist using a list of tracks
     public JuiceboxPlaylist(List<JuiceboxTrack> tracks){}

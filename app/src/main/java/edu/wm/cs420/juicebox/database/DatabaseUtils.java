@@ -40,28 +40,20 @@ public class DatabaseUtils {
     public static JuiceboxParty createParty(String hostId, String partyName, String partyDesc, String latLong, int radius, int privacy){
         String id = getDatabase().child(partyEndpoint).push().getKey();
         JuiceboxParty party = new JuiceboxParty(hostId, partyName, partyDesc, latLong, radius, privacy);
-        getDatabase().child("parties").child(id).setValue(party);
+        getDatabase().child(partyEndpoint).child(id).setValue(party);
         return party;
     }
 
-    public static void addTrackToParty(final String partyId, final Track track, final DatabaseCallback<JuiceboxTrack> callback){
-        getParty(partyId, new DatabaseCallback<JuiceboxParty>() {
-            @Override
-            public void success(JuiceboxParty result) {
-                if(result == null){
-                    callback.failure();
-                }else{
-                    // The party exists so let's add the the track to the queue
-                    JuiceboxTrack juiceboxTrack = new JuiceboxTrack(track);
-                    getDatabase().child(partyEndpoint + partyId).child("queue").push().setValue(track);
-                    callback.success(juiceboxTrack);
-                }
-            }
-            @Override
-            public void failure() {
-                Log.d(TAG, "Track could not be added. Party does not exist!");
-            }
-        });
+    public static void createParty(JuiceboxParty party) {
+        DatabaseReference ref = getDatabase().child(partyEndpoint).push();
+        String id = ref.getKey();
+        party.id = id;
+        ref.setValue(party);
+    }
+
+    public static void addTrackToParty(final JuiceboxParty party, final JuiceboxUser user, final Track track){
+        JuiceboxTrack juiceboxTrack = new JuiceboxTrack(track, user);
+        getDatabase().child(playlistEndpoint + party.playlist_id).child("upcoming").push().setValue(juiceboxTrack);
     }
 
     public static JuiceboxUser createUser(UserPrivate userPrivate) {
@@ -143,6 +135,52 @@ public class DatabaseUtils {
         juiceboxPlaylist.id = ref.getKey();
         ref.setValue(juiceboxPlaylist);
         return juiceboxPlaylist.id;
+    }
+
+    /**
+     * Gets a playlist given the id
+     * @param id id of the playlist
+     * @param callback the callback that will pass the value
+     * @return
+     */
+    public static void getPlaylist(String id, final DatabaseCallback<JuiceboxPlaylist> callback){
+        getDatabase().child(playlistEndpoint + id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                JuiceboxPlaylist playlist = dataSnapshot.getValue(JuiceboxPlaylist.class);
+                if(playlist == null){
+                    callback.failure();
+                }else {
+                    callback.success(playlist);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {callback.cancelled();}
+        });
+    }
+
+    /**
+     * Stop watching a party and its associated playlist for updates
+     * @param party the party
+     * @param partyUpdateSubscriber the callback for party updates
+     * @param playlistUpdateSubscriber the callback for playlist updates
+     */
+    public static void unwatchParty(JuiceboxParty party, ValueEventListener partyUpdateSubscriber,
+                                    ValueEventListener playlistUpdateSubscriber) {
+        getDatabase().child(partyEndpoint + party.id).removeEventListener(partyUpdateSubscriber);
+        getDatabase().child(playlistEndpoint + party.playlist_id).removeEventListener(playlistUpdateSubscriber);
+    }
+
+    /**
+     * Start watching a party and its associated playlist for updates
+     * @param party the party to watch
+     * @param partyUpdateSubscriber the callback for party updates
+     * @param playlistUpdateSubscriber the callback for playlist updates
+     */
+    public static void watchParty(JuiceboxParty party, ValueEventListener partyUpdateSubscriber,
+                                  ValueEventListener playlistUpdateSubscriber) {
+        getDatabase().child(partyEndpoint + party.id).addValueEventListener(partyUpdateSubscriber);
+        getDatabase().child(playlistEndpoint + party.playlist_id).addValueEventListener(playlistUpdateSubscriber);
     }
 
     public static abstract class DatabaseCallback<T>{

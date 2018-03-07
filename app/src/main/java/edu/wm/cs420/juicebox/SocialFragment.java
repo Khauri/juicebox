@@ -30,7 +30,7 @@ import static android.content.ContentValues.TAG;
  * Use the {@link SocialFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SocialFragment extends Fragment implements UserUpdateListener {
+public class SocialFragment extends Fragment implements UserUtils.UserUpdateListener {
     private static final String TAG = "Juicebox-SocialFragment";
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -79,7 +79,7 @@ public class SocialFragment extends Fragment implements UserUpdateListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        UserUtils.addUpdateListener(this);
+        UserUtils.addUpdateListener("user", this);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -99,7 +99,7 @@ public class SocialFragment extends Fragment implements UserUpdateListener {
         profile_pic = getView().findViewById(R.id.appbar_profile_pic);
         reputation_num = getView().findViewById(R.id.app_user_reputation);
         // When the view gets recreated we'll just manually call this method
-        userUpdated(UserUtils.getUser());
+        onUpdate(UserUtils.getUser());
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -127,12 +127,7 @@ public class SocialFragment extends Fragment implements UserUpdateListener {
     }
 
     @Override
-    public void userCreated(JuiceboxUser user) {
-
-    }
-
-    @Override
-    public void userUpdated(JuiceboxUser user) {
+    public void onUpdate(JuiceboxUser user) {
         if(user != null) {
             Log.d(TAG, "userUpdated: user updated!");
             app_user_name.setText(user.name);

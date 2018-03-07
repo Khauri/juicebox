@@ -21,7 +21,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.wm.cs420.juicebox.database.models.JuiceboxPlaylist;
 import edu.wm.cs420.juicebox.database.models.JuiceboxTrack;
+import edu.wm.cs420.juicebox.user.UserUtils;
+import kaaes.spotify.webapi.android.models.Playlist;
 
 
 /**
@@ -32,7 +35,8 @@ import edu.wm.cs420.juicebox.database.models.JuiceboxTrack;
  * Use the {@link QueueFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class QueueFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class QueueFragment extends Fragment implements AdapterView.OnItemClickListener,
+        UserUtils.PlaylistUpdateListener {
     private static String TAG = "juicebox-QueueFragment";
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -81,9 +85,10 @@ public class QueueFragment extends Fragment implements AdapterView.OnItemClickLi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // listen for changes in the playlist
+        UserUtils.addUpdateListener("playlist", this);
 //        songList = new ArrayList();
 //        adapter = new QueueFragmentAdapter(getActivity(), songList);
-
     }
 
     @Override
@@ -113,19 +118,19 @@ public class QueueFragment extends Fragment implements AdapterView.OnItemClickLi
         mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
         // Create some fake data for testing purposes
-        List<JuiceboxTrack> tracks = new ArrayList<>();
-        for(int i = 0; i < 10; i++){
-            JuiceboxTrack jbt = new JuiceboxTrack();
-            jbt.album_name = "TEST TEST TEST";
-            jbt.track_artists = "p, pyself, Pi";
-            jbt.track_name  = "TEST SONG TEST";
-            jbt.duration    = 60 * 3 * 1000;
-            jbt.reputation = 10;
-            tracks.add(jbt);
-        }
-
-        mAdapter = new SearchFragmentAdapter(SearchFragmentAdapter.ViewType.BIG_QUEUE, tracks);
+//        List<JuiceboxTrack> tracks = new ArrayList<>();
+//        for(int i = 0; i < 10; i++){
+//            JuiceboxTrack jbt = new JuiceboxTrack();
+//            jbt.album_name = "TEST TEST TEST";
+//            jbt.track_artists = "p, pyself, Pi";
+//            jbt.track_name  = "TEST SONG TEST";
+//            jbt.duration    = 60 * 3 * 1000;
+//            jbt.reputation = 10;
+//            tracks.add(jbt);
+//        }
+        mAdapter = new SearchFragmentAdapter(SearchFragmentAdapter.ViewType.BIG_QUEUE);
         mRecyclerView.setAdapter(mAdapter);
+        UserUtils.addUpdateListener("playlist", this);
     }
 
     @Override
@@ -158,6 +163,12 @@ public class QueueFragment extends Fragment implements AdapterView.OnItemClickLi
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onUpdate(JuiceboxPlaylist playlist) {
+        ((SearchFragmentAdapter) mAdapter).setData(playlist.upcoming_tracks);
+        mAdapter.notifyDataSetChanged();
     }
 
     /**
