@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
@@ -154,37 +155,46 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         // Meta data
         private TextView    reputation_count;
         // Controls(?)
-        private Button      upvote_btn;
-        private Button      downvote_btn;
+        private ImageButton      upvote_btn;
+        private ImageButton      downvote_btn;
         public QueueItemHolder(View itemView) {
             super(itemView);
             track_name = itemView.findViewById(R.id.track_name_text);
             track_artists = itemView.findViewById(R.id.track_artists_text);
             track_duration = itemView.findViewById(R.id.track_duration_text);
-            track_album_img = itemView.findViewById(R.id.track_album_img);
-            reputation_count = itemView.findViewById(R.id.track_requester_text);
+            track_album_img = itemView.findViewById(R.id.track_album_img);;
             requester_name = itemView.findViewById(R.id.track_requester_text);
-            reputation_count = itemView.findViewById(R.id.track_requester_text);
-            user_img = itemView.findViewById(R.id.track_album_img);
+            reputation_count = itemView.findViewById(R.id.track_rep_count);
+            user_img = itemView.findViewById(R.id.user_profile_pic);
+            upvote_btn = itemView.findViewById(R.id.upvote_btn);
+            downvote_btn = itemView.findViewById(R.id.downvote_btn);
         }
 
         public void bindData(final JuiceboxTrack track) {
             track_name.setText(track.track_name);
-//            // Combine the artists
-//            final StringJoiner joiner = new StringJoiner(", ");
-//            track.artists.forEach(new Consumer<ArtistSimple>() {
-//                @Override
-//                public void accept(ArtistSimple artistSimple){
-//                    joiner.add(artistSimple.name);
-//                }
-//            });
             track_artists.setText(track.track_artists);
             track_duration.setText(DateUtils.formatElapsedTime(track.duration / 1000));
             requester_name.setText(track.user_name);
-            reputation_count.setText(track.reputation);
-
+            reputation_count.setText(NumberFormat.getInstance().format(track.reputation));
+            // load user profile pic
+            Picasso.with(context).load(track.user_pic_url).into(user_img);
             // load album img
             Picasso.with(context).load(track.album_img).into(track_album_img);
+            // TODO
+//            upvote_btn.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    upvote_btn.setChecked(true);
+//                    downvote_btn.setChecked(false);
+//                }
+//            });
+//            downvote_btn.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    upvote_btn.setChecked(false);
+//                    downvote_btn.setChecked(true);
+//                }
+//            });
         }
     }
 
