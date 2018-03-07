@@ -54,14 +54,9 @@ public class EntryActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry);
-
-//        Log.d("tag","got here3");
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        //requestPermissions(EntryActivity.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},
-         //       123);
+
        // requestPermissions();
-        //Toast.makeText(EntryActivity.this, "latitude is" + latitude + ", longitude is" + longitude, Toast.LENGTH_SHORT).show();
-        //Log.d("location", "latitude is" + latitude + ", longitude is" + longitude);
         Button signInButton = findViewById(R.id.button);
         signInButton.setOnClickListener( new View.OnClickListener() {
             @Override

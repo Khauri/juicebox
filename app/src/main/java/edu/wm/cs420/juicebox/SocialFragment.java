@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -130,9 +131,11 @@ public class SocialFragment extends Fragment implements UserUtils.UserUpdateList
     public void onUpdate(JuiceboxUser user) {
         if(user != null) {
             Log.d(TAG, "userUpdated: user updated!");
-            app_user_name.setText(user.name);
+            if(!TextUtils.isEmpty(user.name))
+                app_user_name.setText(user.name);
             reputation_num.setText(NumberFormat.getInstance().format(user.reputation));
-            Picasso.with(getContext()).load(user.images.get(0).url).into(profile_pic);
+            if(user.images != null && user.images.get(0) != null)
+                Picasso.with(getContext()).load(user.images.get(0).url).into(profile_pic);
         }
     }
 
