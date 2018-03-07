@@ -58,22 +58,15 @@ public class EntryActivity extends AppCompatActivity
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         //requestPermissions(EntryActivity.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},
          //       123);
-        requestPermissions();
-        //int MyVersion = Build.VERSION.SDK_INT;
-        //if (MyVersion > Build.VERSION_CODES.LOLLIPOP_MR1) {
-            //if (!checkIfAlreadyhavePermission()) {
-              //  requestForSpecificPermission();
-
-            //}
-        //}
+       // requestPermissions();
         //Toast.makeText(EntryActivity.this, "latitude is" + latitude + ", longitude is" + longitude, Toast.LENGTH_SHORT).show();
         //Log.d("location", "latitude is" + latitude + ", longitude is" + longitude);
-        //openMainActivity();
         Button signInButton = (Button) findViewById(R.id.button);
         signInButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                initiateLoginScreen();
+                openMainActivity();
+                //initiateLoginScreen();
             }
         });
     }
@@ -89,7 +82,11 @@ public class EntryActivity extends AppCompatActivity
                     123);
 
         }
-        //Toast.makeText(activity, "no", Toast.LENGTH_SHORT).show();
+        else{
+            mLocationRequest = LocationRequest.create()
+                            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                            .setInterval(10000);
+        Toast.makeText(EntryActivity.this, "no", Toast.LENGTH_SHORT).show();}
 //        ActivityCompat.requestPermissions(this,
 //                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},
 //                123);
@@ -180,12 +177,6 @@ public class EntryActivity extends AppCompatActivity
             }
 
         }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Log.d(TAG, "onRequestPermissionsResult: ");
     }
 
     private void openMainActivity(){

@@ -7,6 +7,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -18,12 +19,15 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.GeofencingApi;
 import com.google.android.gms.location.LocationSettingsRequest;
@@ -44,6 +48,8 @@ import kaaes.spotify.webapi.android.models.PlaylistSimple;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+
+import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class MainActivity
         extends AppCompatActivity
@@ -69,6 +75,7 @@ public class MainActivity
     private double latitude;
     private LocationRequest mLocationRequest;
     private LocationRequest locationRequest;
+    private long lastUpdatedTime = 0;
 
     private static QueueFragment queueFragment;
     private static SearchFragment searchFragment;
@@ -121,25 +128,8 @@ public class MainActivity
         mPager.setCurrentItem(1);
         mGeofencingClient = LocationServices.getGeofencingClient(this);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-//        // Create the location request to start receiving updates
-//        locationRequest = new LocationRequest();
-//        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-//        locationRequest.setInterval(0);
-//
-//        // Create LocationSettingsRequest object using location request
-//        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
-//        builder.addLocationRequest(locationRequest);
-//        LocationSettingsRequest locationSettingsRequest = builder.build();
-//
-//        // Check whether location settings are satisfied
-//        SettingsClient settingsClient = LocationServices.getSettingsClient(this);
-//        settingsClient.checkLocationSettings(locationSettingsRequest);
-//
-//        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            return;
-//        }
-
-        //getLocation();
+        requestPermissions();
+//        getLocation();
 //        try{
 //            mFusedLocationClient.getLastLocation()
 //                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
@@ -167,32 +157,114 @@ public class MainActivity
 
         //getAlbum();
     }
+    //public void requestPermissions (Activity activity, String[] permissions, int requestCode){
+    public void requestPermissions () {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                ) {//Can add more as per requirement
+            //Toast.makeText(activity, "yes", Toast.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                    123);
 
-//    public void getLocation(){
-//        Log.d("check","got here2");
-//        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-//                ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-//                ){//Can add more as per requirement
-//
+        }else{
+        // Create the location request to start receiving updates
+        locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(10000);
+
+        // Create LocationSettingsRequest object using location request
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder.addLocationRequest(locationRequest);
+        LocationSettingsRequest locationSettingsRequest = builder.build();
+
+        // Check whether location settings are satisfied
+        SettingsClient settingsClient = LocationServices.getSettingsClient(this);
+        settingsClient.checkLocationSettings(locationSettingsRequest);
+
+        //if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        //    return;
+        //}
+        getFusedLocationProviderClient(this).requestLocationUpdates(locationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        latitude = locationResult.getLastLocation().getLatitude();
+                        longitude = locationResult.getLastLocation().getLongitude();
+                        Toast.makeText(MainActivity.this, "longitude is " + longitude + ", latitude is " + latitude, Toast.LENGTH_SHORT).show();
+                        onLocationChanged(locationResult.getLastLocation(), false);
+                    }
+                },
+                Looper.myLooper());}
+    }
+
+    public void onLocationChanged(Location location, boolean forceUpdate) {
+        long currentTime = System.currentTimeMillis();
+        if (forceUpdate || currentTime - lastUpdatedTime > 10000) {
+            //Log.d("TIMES", currentTime + " " + lastUpdatedTime + " " + (currentTime - lastUpdatedTime));
+            lastUpdatedTime = currentTime;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult (int requestCode, String[] permissions, int[] grantResults){
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        //Toast.makeText(EntryActivity.this, "got here" , Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onRequestPermissionsResult");
+        // Create the location request to start receiving updates
+        locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(10000);
+
+        // Create LocationSettingsRequest object using location request
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder.addLocationRequest(locationRequest);
+        LocationSettingsRequest locationSettingsRequest = builder.build();
+
+        // Check whether location settings are satisfied
+        SettingsClient settingsClient = LocationServices.getSettingsClient(this);
+        settingsClient.checkLocationSettings(locationSettingsRequest);
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        getFusedLocationProviderClient(this).requestLocationUpdates(locationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        onLocationChanged(locationResult.getLastLocation(), false);
+                        latitude = locationResult.getLastLocation().getLatitude();
+                        longitude = locationResult.getLastLocation().getLongitude();
+                        Toast.makeText(MainActivity.this, "longitude is " + longitude + ", latitude is " + latitude, Toast.LENGTH_SHORT).show();
+                    }
+                },
+                Looper.myLooper());
+
+    }
+
+    public void getLocation(){
+        Log.d("check","got here2");
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                ){//Can add more as per requirement
+
 //            ActivityCompat.requestPermissions(this,
 //                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},
 //                    123);
-//            mFusedLocationClient.getLastLocation()
-//                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-//                        @Override
-//                        public void onSuccess(Location location) {
-//                            Log.d("check","got here4");
-//                            // Got last known location. In some rare situations this can be null.
-//                            if (location != null) {
-//                                latitude = location.getLatitude();
-//                                longitude = location.getLongitude();
-//                                Log.d("location", "latitude is" + latitude + ", longitude is" + longitude);
-//                            }
-//                        }
-//                    });
-//        }
-//        Log.d("tag","got here3");
-//    }
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            Log.d("check","got here4");
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                latitude = location.getLatitude();
+                                longitude = location.getLongitude();
+                                Log.d("location", "latitude is" + latitude + ", longitude is" + longitude);
+                            }
+                        }
+                    });
+        }
+        Log.d("tag","got here3");
+    }
 
 
     public void getAlbum(){
