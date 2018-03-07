@@ -45,6 +45,12 @@ public class UserUtils {
     private static  JuiceboxParty party;
 
     private static List<?> listeners2 = new ArrayList<>();
+
+    public static boolean isHost() {
+        if(user == null || party == null || TextUtils.isEmpty(user.id) || TextUtils.isEmpty(party.host_id))
+            return false;
+        return user.id.equals(party.host_id);
+    }
     // A Value event listener for the current playlist
     private static ValueEventListener playlistUpdateSubscriber = new ValueEventListener() {
         @Override

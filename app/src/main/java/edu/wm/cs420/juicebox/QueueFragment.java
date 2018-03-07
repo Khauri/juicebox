@@ -7,14 +7,18 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SnapHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.Serializable;
@@ -57,7 +61,13 @@ public class QueueFragment extends Fragment implements AdapterView.OnItemClickLi
     private RecyclerView.LayoutManager mLayoutManager;
 
     private QueueFragmentAdapter adapter;
-    private Button btnNewParty;
+    private FrameLayout hostPartyButton;
+    // The two screens we have to manage
+    // Yes this is a stupid way to do this
+    // but we're running out of time
+    private View start_screen;
+    private View queue_screen;
+    private View playback_controls;
 
     public QueueFragment() {
         // Required empty public constructor
@@ -105,40 +115,47 @@ public class QueueFragment extends Fragment implements AdapterView.OnItemClickLi
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        btnNewParty = getView().findViewById(R.id.button_create_party);
-        btnNewParty.setOnClickListener(new View.OnClickListener() {
+        hostPartyButton = getView().findViewById(R.id.host_party_btn);
+        hostPartyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), NewPartyActivity.class);
-                // Maybe use startActivityForResult?
                 startActivity(intent);
             }
         });
+        start_screen = getView().findViewById(R.id.start_screen);
+        queue_screen = getView().findViewById(R.id.queue_screen);
+        playback_controls = getView().findViewById(R.id.playback_controls);
+        checkIfParty();
+
         mRecyclerView = getView().findViewById(R.id.song_results);
         mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        // Create some fake data for testing purposes
-//        List<JuiceboxTrack> tracks = new ArrayList<>();
-//        for(int i = 0; i < 10; i++){
-//            JuiceboxTrack jbt = new JuiceboxTrack();
-//            jbt.album_name = "TEST TEST TEST";
-//            jbt.track_artists = "p, pyself, Pi";
-//            jbt.track_name  = "TEST SONG TEST";
-//            jbt.duration    = 60 * 3 * 1000;
-//            jbt.reputation = 10;
-//            tracks.add(jbt);
-//        }
         mAdapter = new SearchFragmentAdapter(SearchFragmentAdapter.ViewType.BIG_QUEUE);
         mRecyclerView.setAdapter(mAdapter);
+        SnapHelper helper = new LinearSnapHelper();
+        helper.attachToRecyclerView(mRecyclerView);
         UserUtils.addUpdateListener("playlist", this);
+    }
+
+    private void checkIfParty() {
+        if(UserUtils.isInParty()){
+            queue_screen.setVisibility(View.VISIBLE);
+            start_screen.setVisibility(View.GONE);
+            if(UserUtils.isHost()){
+                // Add playback controls
+                playback_controls.setVisibility(View.VISIBLE);
+            }
+        }else{
+            queue_screen.setVisibility(View.GONE);
+            start_screen.setVisibility(View.VISIBLE);
+            playback_controls.setVisibility(View.GONE);
+        }
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        Log.d("OnResume", "onResume() called!");
-//        adapter = new QueueFragmentAdapter(getActivity(), songList);
-//        setListAdapter(adapter);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -169,6 +186,8 @@ public class QueueFragment extends Fragment implements AdapterView.OnItemClickLi
     public void onUpdate(JuiceboxPlaylist playlist) {
         ((SearchFragmentAdapter) mAdapter).setData(playlist.upcoming_tracks);
         mAdapter.notifyDataSetChanged();
+        // This definitely shouldn't go here but whatever
+        checkIfParty();
     }
 
     /**
@@ -196,17 +215,11 @@ public class QueueFragment extends Fragment implements AdapterView.OnItemClickLi
     @Override
     public void onSaveInstanceState(final Bundle outstate){
         super.onSaveInstanceState(outstate);
-        //outstate.putSerializable("list", (Serializable) songList);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
-
-//        if (savedInstanceState != null){
-//            songList = (List<SongListItem>) savedInstanceState.getSerializable("list");
-//        }
-        //everything should be fine here...
     }
 
     public List<SongListItem> getSongList(){
@@ -218,9 +231,5 @@ public class QueueFragment extends Fragment implements AdapterView.OnItemClickLi
     }
 
     public void updateQueue(SongListItem song){
-//        Log.d("updateQueue", "updateQueue called!");
-//        songList.add(song);
-//        adapter = new QueueFragmentAdapter(getActivity(), songList);
-//        setListAdapter(adapter);
     }
 }
