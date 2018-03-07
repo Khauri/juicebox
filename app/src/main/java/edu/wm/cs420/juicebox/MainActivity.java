@@ -2,15 +2,18 @@ package edu.wm.cs420.juicebox;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -23,6 +26,8 @@ import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.GeofencingApi;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.spotify.sdk.android.player.Error;
@@ -62,6 +67,8 @@ public class MainActivity
     private FusedLocationProviderClient mFusedLocationClient;
     private double longitude;
     private double latitude;
+    private LocationRequest mLocationRequest;
+    private LocationRequest locationRequest;
 
     private static QueueFragment queueFragment;
     private static SearchFragment searchFragment;
@@ -112,11 +119,27 @@ public class MainActivity
             }
         });
         mPager.setCurrentItem(1);
-
-        //
         mGeofencingClient = LocationServices.getGeofencingClient(this);
-//        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-//        //getLocation();
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+//        // Create the location request to start receiving updates
+//        locationRequest = new LocationRequest();
+//        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//        locationRequest.setInterval(0);
+//
+//        // Create LocationSettingsRequest object using location request
+//        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+//        builder.addLocationRequest(locationRequest);
+//        LocationSettingsRequest locationSettingsRequest = builder.build();
+//
+//        // Check whether location settings are satisfied
+//        SettingsClient settingsClient = LocationServices.getSettingsClient(this);
+//        settingsClient.checkLocationSettings(locationSettingsRequest);
+//
+//        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            return;
+//        }
+
+        //getLocation();
 //        try{
 //            mFusedLocationClient.getLastLocation()
 //                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
@@ -145,8 +168,32 @@ public class MainActivity
         //getAlbum();
     }
 
-    //public void getLocation(){
-    //}
+//    public void getLocation(){
+//        Log.d("check","got here2");
+//        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+//                ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+//                ){//Can add more as per requirement
+//
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},
+//                    123);
+//            mFusedLocationClient.getLastLocation()
+//                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+//                        @Override
+//                        public void onSuccess(Location location) {
+//                            Log.d("check","got here4");
+//                            // Got last known location. In some rare situations this can be null.
+//                            if (location != null) {
+//                                latitude = location.getLatitude();
+//                                longitude = location.getLongitude();
+//                                Log.d("location", "latitude is" + latitude + ", longitude is" + longitude);
+//                            }
+//                        }
+//                    });
+//        }
+//        Log.d("tag","got here3");
+//    }
+
 
     public void getAlbum(){
         Log.d(TAG, "getAlbum: Retrieving my playlists");

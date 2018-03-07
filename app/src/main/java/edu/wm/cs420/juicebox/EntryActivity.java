@@ -1,5 +1,6 @@
 package edu.wm.cs420.juicebox;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -11,8 +12,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
@@ -43,13 +46,28 @@ public class EntryActivity extends AppCompatActivity
     double latitude;
     double longitude;
     private FusedLocationProviderClient mFusedLocationClient;
+    private LocationRequest mLocationRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry);
+
+//        Log.d("tag","got here3");
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        getLocation();
+        //requestPermissions(EntryActivity.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},
+         //       123);
+        requestPermissions();
+        //int MyVersion = Build.VERSION.SDK_INT;
+        //if (MyVersion > Build.VERSION_CODES.LOLLIPOP_MR1) {
+            //if (!checkIfAlreadyhavePermission()) {
+              //  requestForSpecificPermission();
+
+            //}
+        //}
+        //Toast.makeText(EntryActivity.this, "latitude is" + latitude + ", longitude is" + longitude, Toast.LENGTH_SHORT).show();
+        //Log.d("location", "latitude is" + latitude + ", longitude is" + longitude);
+        //openMainActivity();
         Button signInButton = (Button) findViewById(R.id.button);
         signInButton.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -59,31 +77,70 @@ public class EntryActivity extends AppCompatActivity
         });
     }
 
-    public void getLocation(){
-        Log.d("check","got here2");
+    //public void requestPermissions (Activity activity, String[] permissions, int requestCode){
+    public void requestPermissions (){
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 ){//Can add more as per requirement
-
+            //Toast.makeText(activity, "yes", Toast.LENGTH_SHORT).show();
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},
                     123);
-//            mFusedLocationClient.getLastLocation()
-//                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-//                        @Override
-//                        public void onSuccess(Location location) {
-//                            Log.d("check","got here4");
-//                            // Got last known location. In some rare situations this can be null.
-//                            if (location != null) {
-//                                latitude = location.getLatitude();
-//                                longitude = location.getLongitude();
-//                                Log.d("location", "latitude is" + latitude + ", longitude is" + longitude);
-//                            }
-//                        }
-//                    });
+
         }
-        Log.d("tag","got here3");
+        //Toast.makeText(activity, "no", Toast.LENGTH_SHORT).show();
+//        ActivityCompat.requestPermissions(this,
+//                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},
+//                123);
     }
+    @Override
+    public void onRequestPermissionsResult (int requestCode, String[] permissions, int[] grantResults){
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        //Toast.makeText(EntryActivity.this, "got here" , Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onRequestPermissionsResult");
+//        switch (requestCode) {
+//            case 123:
+//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    //granted
+//                    Toast.makeText(this, "permission granted", Toast.LENGTH_SHORT).show();
+//                    Log.d("tag3","permission granted");
+//                    try{
+//                    mLocationRequest = LocationRequest.create()
+//                            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+//                            .setInterval(0);
+//                    mFusedLocationClient.getLastLocation()
+//                            .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+//                                @Override
+//                                public void onSuccess(Location location) {
+//                                    Log.d("check","got here4");
+//                                    // Got last known location. In some rare situations this can be null.
+//                                    if (location != null) {
+//                                        latitude = location.getLatitude();
+//                                        longitude = location.getLongitude();
+//                                        Toast.makeText(EntryActivity.this, "latitude is" + latitude + ", longitude is" + longitude, Toast.LENGTH_SHORT).show();
+//                                        Log.d("location", "latitude is" + latitude + ", longitude is" + longitude);
+//                                    }
+//                                }
+//                            });
+//                    }catch (SecurityException e) {
+//
+//                    } catch (Exception e) {
+//
+//                    }
+//
+//                } else {
+//                    //not granted
+//                    Toast.makeText(this, "permission not granted", Toast.LENGTH_SHORT).show();
+//                    Log.d("tag4","permission not granted");
+//                }
+//                break;
+//            default:
+//                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        }
+
+    }
+
+
     private void initiateLoginScreen(){
         // Authentifications
         AuthenticationRequest.Builder builder;
