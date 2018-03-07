@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -129,31 +130,6 @@ public class MainActivity
         mGeofencingClient = LocationServices.getGeofencingClient(this);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         requestPermissions();
-//        getLocation();
-//        try{
-//            mFusedLocationClient.getLastLocation()
-//                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-//                        @Override
-//                        public void onSuccess(Location location) {
-//                            if (location != null) {
-//                                latitude = location.getLatitude();
-//                                longitude = location.getLongitude();
-//                                Log.d("location", "latitude is" + latitude + ", longitude is" + longitude);
-//                                Geofence fence = new Geofence.Builder().setCircularRegion(latitude,longitude,100).build();
-//                                // Got last known location. In some rare situations this can be null.
-//                                // Logic to handle location object
-//                            }
-//                            else{
-//                                Geofence fence = new Geofence.Builder().setCircularRegion(37.4220,-122.0840,100).build();
-//                            }
-//                        }
-//                    });
-//        } catch (SecurityException e) {
-//
-//        } catch (Exception e) {
-//
-//        }
-
 
         //getAlbum();
     }
@@ -185,16 +161,46 @@ public class MainActivity
         //if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
         //    return;
         //}
+
+        getLocationOnce();
         getFusedLocationProviderClient(this).requestLocationUpdates(locationRequest, new LocationCallback() {
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
                         latitude = locationResult.getLastLocation().getLatitude();
                         longitude = locationResult.getLastLocation().getLongitude();
-                        Toast.makeText(MainActivity.this, "longitude is " + longitude + ", latitude is " + latitude, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(MainActivity.this, "longitude is " + longitude + ", latitude is " + latitude, Toast.LENGTH_SHORT).show();
                         onLocationChanged(locationResult.getLastLocation(), false);
                     }
                 },
                 Looper.myLooper());}
+    }
+
+    private void getLocationOnce() {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        try {
+            locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    MainActivity.this.onLocationChanged(location, true);
+                    latitude = location.getLatitude();
+                    longitude = location.getLongitude();
+                    //Toast.makeText(MainActivity.this, "longitude is " + longitude + ", latitude is " + latitude, Toast.LENGTH_SHORT).show();
+
+                }
+
+                @Override
+                public void onStatusChanged(String s, int i, Bundle bundle) { }
+                @Override
+                public void onProviderEnabled(String s) { }
+                @Override
+                public void onProviderDisabled(String s) { }
+
+            }, Looper.getMainLooper());
+        } catch (SecurityException e) {
+
+        } catch (Exception e) {
+
+        }
     }
 
     public void onLocationChanged(Location location, boolean forceUpdate) {
@@ -233,7 +239,7 @@ public class MainActivity
                         onLocationChanged(locationResult.getLastLocation(), false);
                         latitude = locationResult.getLastLocation().getLatitude();
                         longitude = locationResult.getLastLocation().getLongitude();
-                        Toast.makeText(MainActivity.this, "longitude is " + longitude + ", latitude is " + latitude, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(MainActivity.this, "longitude is " + longitude + ", latitude is " + latitude, Toast.LENGTH_SHORT).show();
                     }
                 },
                 Looper.myLooper());
