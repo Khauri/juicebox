@@ -47,6 +47,7 @@ public class NewPartyActivity extends AppCompatActivity {
     // Radio Group
     private RadioGroup rgPrivacySet;
     private int privacy;
+    private MainActivity mainActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,7 +166,10 @@ public class NewPartyActivity extends AppCompatActivity {
 
     private void hostNewParty(){
         // TODO: Get the User's Last known location (doesn't have to be a string)
-        String latLong = "37.269228,-76.712753"; // Roughly my room in williamsburg
+        String latitude = Double.toString(mainActivity.getLatitude());
+        String longitude = Double.toString(mainActivity.getLongitude());
+        //String latLong = "37.269228,-76.712753"; // Roughly my room in williamsburg
+        String latLong = latitude+","+longitude;
         // create the party
         JuiceboxParty party = new JuiceboxParty();
         party.name = partyName;
