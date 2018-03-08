@@ -3,6 +3,7 @@ package edu.wm.cs420.juicebox.database;
 import android.util.Log;
 
 import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -59,12 +60,48 @@ public class DatabaseUtils {
         DatabaseReference ref = getDatabase().child(partyEndpoint).push();
         String id = ref.getKey();
         party.id = id;
+        getGeoFire().setLocation(id, new GeoLocation(party.latitude, party.longitude), new GeoFire.CompletionListener() {
+            @Override
+            public void onComplete(String key, DatabaseError error) {
+
+            }
+        });
         ref.setValue(party);
     }
 
     public static void addTrackToParty(final JuiceboxParty party, final JuiceboxUser user, final Track track){
         JuiceboxTrack juiceboxTrack = new JuiceboxTrack(track, user);
         getDatabase().child(playlistEndpoint + party.playlist_id).child("upcoming").push().setValue(juiceboxTrack);
+    }
+
+    public static void peekTrack(JuiceboxParty party, final DatabaseCallback<JuiceboxTrack> callback){
+        getDatabase().child(playlistEndpoint + party.playlist_id).child("upcoming")
+                .orderByKey()
+                .limitToFirst(1)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        JuiceboxTrack track = null;
+                        for(DataSnapshot s : dataSnapshot.getChildren())
+                            track = dataSnapshot.getValue(JuiceboxTrack.class);
+                        if(track == null){
+                            callback.failure();
+                        }else{
+                            Log.d(TAG, "onDataChange: " + track.track_id);
+                            callback.success(track);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        // boo
+                        callback.cancelled();
+                    }
+                });
+    }
+
+    public static void popTrack(){
+
     }
 
     public static JuiceboxUser createUser(UserPrivate userPrivate) {
@@ -87,6 +124,8 @@ public class DatabaseUtils {
                 if(juiceboxParty == null){
                     callback.failure();
                 }else{
+                    for(DataSnapshot d : dataSnapshot.getChildren())
+                        juiceboxParty.id = d.getKey();
                     callback.success(juiceboxParty);
                 }
             }
@@ -111,8 +150,8 @@ public class DatabaseUtils {
                 if(user == null){
                     callback.failure();
                 }else{
-                    for(DataSnapshot snapshot : dataSnapshot.getChildren())
-                        user.id = snapshot.getKey();
+                    user.id = dataSnapshot.getKey();
+                    Log.d(TAG, "onDataChange: USER'S ID" + user.id);
                     callback.success(user);
                 }
             }

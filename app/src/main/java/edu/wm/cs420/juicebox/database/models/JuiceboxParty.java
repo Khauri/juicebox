@@ -32,6 +32,8 @@ public class JuiceboxParty {
     public int privacy;                 // The privacy setting (0=friendly,1=invite,2=public)
     public long created_at;             // The precise time in ms this party was created at
     public List<String> participants;   // A list of current participants
+    public double latitude = 0;
+    public double longitude = 0;
 
     public JuiceboxParty(){}
 

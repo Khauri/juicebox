@@ -20,11 +20,18 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
+
+import com.spotify.sdk.android.player.Error;
+import com.spotify.sdk.android.player.Player;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
+import edu.wm.cs420.juicebox.database.DatabaseUtils;
+import edu.wm.cs420.juicebox.database.models.JuiceboxParty;
 import edu.wm.cs420.juicebox.database.models.JuiceboxPlaylist;
 import edu.wm.cs420.juicebox.database.models.JuiceboxTrack;
 import edu.wm.cs420.juicebox.user.UserUtils;
@@ -39,8 +46,12 @@ import kaaes.spotify.webapi.android.models.Playlist;
  * Use the {@link QueueFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class QueueFragment extends Fragment implements AdapterView.OnItemClickListener,
-        UserUtils.PlaylistUpdateListener {
+public class QueueFragment 
+        extends 
+            Fragment 
+        implements
+            UserUtils.PlaylistUpdateListener
+{
     private static String TAG = "juicebox-QueueFragment";
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -60,7 +71,10 @@ public class QueueFragment extends Fragment implements AdapterView.OnItemClickLi
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private QueueFragmentAdapter adapter;
+    private RecyclerView nearbyPartiesView;
+    private RecyclerView.Adapter nearbyAdapter;
+    private RecyclerView.LayoutManager nearbyLayoutManager;
+
     private FrameLayout hostPartyButton;
     // The two screens we have to manage
     // Yes this is a stupid way to do this
@@ -68,10 +82,52 @@ public class QueueFragment extends Fragment implements AdapterView.OnItemClickLi
     private View start_screen;
     private View queue_screen;
     private View playback_controls;
+    private ToggleButton play_button;
 
-    public QueueFragment() {
-        // Required empty public constructor
-    }
+    public QueueFragment() {}
+
+    private UserUtils.PartyUpdateListener pul = new UserUtils.PartyUpdateListener() {
+        @Override
+        public void enterPartyZone(JuiceboxParty party) {
+            List<JuiceboxParty> jl = (List<JuiceboxParty>) ((SearchFragmentAdapter) nearbyAdapter).getData();
+            jl.add(party);
+            nearbyAdapter.notifyDataSetChanged();
+        }
+
+        @Override
+        public void exitPartyZone(final JuiceboxParty party) {
+            Log.d(TAG, "exitPartyZone: EXITED A PARTY ZONE");
+            List<JuiceboxParty> jl = (List<JuiceboxParty>) ((SearchFragmentAdapter) nearbyAdapter).getData();
+            jl.removeIf(new Predicate<JuiceboxParty>() {
+                @Override
+                public boolean test(JuiceboxParty juiceboxParty) {
+                    return juiceboxParty.id == party.id;
+                }
+            });
+            nearbyAdapter.notifyDataSetChanged();
+        }
+
+        @Override
+        public void userPartyUpdated(JuiceboxParty party) {
+            // The status of the party has changed in some way
+        }
+
+        @Override
+        public void userJoinedParty(JuiceboxParty o) {
+            checkIfParty();
+        }
+
+        @Override
+        public void userExitedParty() {
+            checkIfParty();
+        }
+
+        @Override
+        public void onUpdate(JuiceboxParty data) {
+            // this is the same as userPartyUpdated, so I don't know why
+            // I included it tbh
+        }
+    };
 
     /**
      * Use this factory method to create a new instance of
@@ -97,6 +153,7 @@ public class QueueFragment extends Fragment implements AdapterView.OnItemClickLi
         super.onCreate(savedInstanceState);
         // listen for changes in the playlist
         UserUtils.addUpdateListener("playlist", this);
+        UserUtils.addUpdateListener("party", pul);
 //        songList = new ArrayList();
 //        adapter = new QueueFragmentAdapter(getActivity(), songList);
     }
@@ -126,6 +183,50 @@ public class QueueFragment extends Fragment implements AdapterView.OnItemClickLi
         start_screen = getView().findViewById(R.id.start_screen);
         queue_screen = getView().findViewById(R.id.queue_screen);
         playback_controls = getView().findViewById(R.id.playback_controls);
+        play_button = getView().findViewById(R.id.play_toggle);
+        play_button.setOnClickListener(new View.OnClickListener() {
+            private boolean playing = false;
+            @Override
+            public void onClick(View view) {
+                if(true) {
+                    Log.d(TAG, "onClick: Playing song");
+                    UserUtils.getCurrTrack(new DatabaseUtils.DatabaseCallback<JuiceboxTrack>() {
+                        @Override
+                        public void success(JuiceboxTrack track) {
+                            SpotifyUtils.playSong(track.track_id, new Player.OperationCallback() {
+                                @Override
+                                public void onSuccess() {
+                                    playing = true;
+                                    play_button.setChecked(true);
+                                }
+                                @Override
+                                public void onError(Error error) {
+                                    Log.d(TAG, "onError: " + error.toString());
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void failure() {
+
+                        }
+                    });
+                } else
+                    Log.d(TAG, "onClick: Pausing song");
+                    SpotifyUtils.pause(new Player.OperationCallback() {
+                        @Override
+                        public void onSuccess() {
+                            playing = false;
+                            play_button.setChecked(false);
+                        }
+
+                        @Override
+                        public void onError(Error error) {
+
+                        }
+                    });
+            }
+        });
         checkIfParty();
 
         mRecyclerView = getView().findViewById(R.id.song_results);
@@ -136,6 +237,12 @@ public class QueueFragment extends Fragment implements AdapterView.OnItemClickLi
         SnapHelper helper = new LinearSnapHelper();
         helper.attachToRecyclerView(mRecyclerView);
         UserUtils.addUpdateListener("playlist", this);
+        // setup nearby parties adapter
+        nearbyPartiesView = getView().findViewById(R.id.nearby_parties_list);
+        nearbyLayoutManager = new LinearLayoutManager(getContext());
+        nearbyPartiesView.setLayoutManager(nearbyLayoutManager);
+        nearbyAdapter = new SearchFragmentAdapter(SearchFragmentAdapter.ViewType.PARTY_LIST);
+        nearbyPartiesView.setAdapter(nearbyAdapter);
     }
 
     private void checkIfParty() {
@@ -144,13 +251,13 @@ public class QueueFragment extends Fragment implements AdapterView.OnItemClickLi
             start_screen.setVisibility(View.GONE);
             if(UserUtils.isHost()){
                 // Add playback controls
-                playback_controls.setVisibility(View.VISIBLE);
+                playback_controls.setVisibility(View.GONE);
             }
         }else{
             queue_screen.setVisibility(View.GONE);
             start_screen.setVisibility(View.VISIBLE);
-            playback_controls.setVisibility(View.VISIBLE);
-//            playback_controls.setVisibility(View.GONE);
+//            playback_controls.setVisibility(View.VISIBLE);
+            playback_controls.setVisibility(View.GONE);
         }
     }
 
@@ -183,6 +290,7 @@ public class QueueFragment extends Fragment implements AdapterView.OnItemClickLi
         mListener = null;
     }
 
+    // Poorly named method for when the playlist is updated :(
     @Override
     public void onUpdate(JuiceboxPlaylist playlist) {
         ((SearchFragmentAdapter) mAdapter).setData(playlist.upcoming_tracks);
@@ -206,12 +314,6 @@ public class QueueFragment extends Fragment implements AdapterView.OnItemClickLi
         void onFragmentInteraction(Uri uri);
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-//        SongListItem item = this.songList.get(position);
-//        Toast.makeText(getActivity(), item.getName() + " Clicked!", Toast.LENGTH_SHORT).show();
-    }
-
     //following two methods help us save the state of the fragment
     @Override
     public void onSaveInstanceState(final Bundle outstate){
@@ -225,10 +327,6 @@ public class QueueFragment extends Fragment implements AdapterView.OnItemClickLi
 
     public List<SongListItem> getSongList(){
         return songList;
-    }
-
-    public QueueFragmentAdapter getAdapter(){
-        return adapter;
     }
 
     public void updateQueue(SongListItem song){

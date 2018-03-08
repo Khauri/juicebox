@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/colorBlack"
     tools:context="edu.wm.cs420.juicebox.NewPartyActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="660dp"
         android:isScrollContainer="true"
         android:nestedScrollingEnabled="true"
         android:orientation="vertical"
@@ -22,6 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
+            android:layout_weight="0"
             android:paddingLeft="25dp"
             android:paddingRight="25dp"
             android:text="YOU'RE 3 STEPS AWAY FROM AN EPIC PARTY"
@@ -34,6 +35,7 @@
             android:id="@+id/textView2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="0"
             android:fontFamily="sans-serif-condensed"
             android:text="The best parties in history have all started with an epic name and an epic sub-250 character description!"
             android:textColor="@android:color/darker_gray" />
@@ -43,6 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
             android:layout_marginTop="15dp"
+            android:layout_weight="0"
             app:cardBackgroundColor="@color/colorSecondaryDark"
             app:contentPadding="10dp">
 
@@ -97,6 +100,7 @@
             android:id="@+id/textView3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="0"
             android:fontFamily="sans-serif-condensed"
             android:text="Whether you're just having a kickback or a massive rager, here's where you determine how people will join in on the fun!"
             android:textAlignment="viewStart"
@@ -107,6 +111,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
             android:layout_marginTop="15dp"
+            android:layout_weight="0"
             app:cardBackgroundColor="@color/colorSecondaryDark"
             app:contentPadding="10dp">
 
@@ -175,6 +180,7 @@
             android:id="@+id/textView13"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="0"
             android:fontFamily="sans-serif-condensed"
             android:text="How great of an impact should your party make? "
             android:textColor="@android:color/darker_gray" />
@@ -183,6 +189,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
+            android:layout_weight="0"
             app:cardBackgroundColor="@color/colorSecondaryDark"
             app:contentPadding="10dp">
 
@@ -235,7 +242,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="0"
             android:gravity="bottom">
 
             <android.support.v7.widget.CardView
@@ -255,4 +262,4 @@
 
     </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+</FrameLayout>

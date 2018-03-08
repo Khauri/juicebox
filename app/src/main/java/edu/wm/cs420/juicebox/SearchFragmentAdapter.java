@@ -2,6 +2,7 @@ package edu.wm.cs420.juicebox;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,13 +16,18 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import org.w3c.dom.Text;
+
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
 
+import edu.wm.cs420.juicebox.database.DatabaseUtils;
+import edu.wm.cs420.juicebox.database.models.JuiceboxParty;
 import edu.wm.cs420.juicebox.database.models.JuiceboxTrack;
+import edu.wm.cs420.juicebox.database.models.JuiceboxUser;
 import edu.wm.cs420.juicebox.user.UserUtils;
 import kaaes.spotify.webapi.android.models.ArtistSimple;
 import kaaes.spotify.webapi.android.models.Track;
@@ -33,7 +39,7 @@ import kaaes.spotify.webapi.android.models.Track;
 public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static String TAG = "Juicebox-ListAdapter";
 
-    public enum ViewType {SEARCH, BIG_QUEUE};
+    public enum ViewType {SEARCH, PARTY_LIST, BIG_QUEUE};
 
     // Important instance data
     private List<?> data;           // This class isn't concerned with the list type
@@ -45,6 +51,7 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     public void setData(List<?> data) {
         this.data = data;
     }
+    public List<?> getData(){ return this.data; }
 
     /**
      * A base class viewholder implementation so that this adapter can be re-used
@@ -55,6 +62,50 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     public static abstract class myViewHolder<T> extends RecyclerView.ViewHolder{
         public myViewHolder(View itemView){super(itemView);}
         public abstract void bindData(T data);
+    }
+
+    public static class NearbyPartiesHolder extends myViewHolder<JuiceboxParty>{
+        private JuiceboxParty party;
+        private View join_party_btn;
+        private TextView party_name;
+        private TextView party_description;
+        private TextView host_name;
+        private ImageView host_image;
+
+        public NearbyPartiesHolder(View itemView) {
+            super(itemView);
+            party_name = itemView.findViewById(R.id.party_name_text);
+            party_description = itemView.findViewById(R.id.party_desc_text);
+            host_name = itemView.findViewById(R.id.party_host_name_text);
+            host_image = itemView.findViewById(R.id.party_host_img);
+            join_party_btn = itemView.findViewById(R.id.join_party_btn);
+        }
+
+        @Override
+        public void bindData(final JuiceboxParty party) {
+            party_name.setText(TextUtils.isEmpty(party.name) ? "Epic Party!" : party.name);
+            party_description.setText(TextUtils.isEmpty(party.description) ? "WOW PARTY" : party.description);
+            DatabaseUtils.getUser(party.host_id, new DatabaseUtils.DatabaseCallback<JuiceboxUser>() {
+                @Override
+                public void success(JuiceboxUser result) {
+                    Log.d(TAG, "success: GET THE RESULT");
+                    host_name.setText(TextUtils.isEmpty(result.name) ? "Party Pete" : result.name);
+                    if(result.images != null && result.images.size() > 0)
+                        Picasso.with(context).load(result.images.get(0).url).into(host_image);
+                }
+
+                @Override
+                public void failure() {
+                    // cry
+                }
+            });
+            join_party_btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    UserUtils.joinParty(party);
+                }
+            });
+        }
     }
 
     /**
@@ -217,6 +268,8 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 return new SearchItemHolder(view);
             case R.layout.queue_list_item:
                 return new QueueItemHolder(view);
+            case R.layout.nearby_party_list_item:
+                return new NearbyPartiesHolder(view);
             default:
                 Log.e(TAG, "onCreateViewHolder: unrecognized or unsupported viewType");
                 return null;
@@ -246,6 +299,8 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 return R.layout.song_list_item;
             case BIG_QUEUE:
                 return R.layout.queue_list_item;
+            case PARTY_LIST:
+                return R.layout.nearby_party_list_item;
             default:
                 return 0;
         }
@@ -260,37 +315,4 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         anim.setDuration(500);
         view.startAnimation(anim);
     }
-
-//    public class ViewHolder {
-//        TextView tv;
-//        Button btn;
-//    }
-
-//    @Override
-//    public View getView(int position, View convertView, ViewGroup parent){
-//        LayoutInflater mInflater = (LayoutInflater) context.
-//                getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-//        ViewHolder holder;
-//        if (convertView == null){
-//           convertView = mInflater.inflate(R.layout.search_list_item, null);
-//           holder = new ViewHolder();
-//           holder.tv = (TextView) convertView.findViewById(R.id.song_name);
-//           holder.btn = (Button) convertView.findViewById(R.id.add_to_queue_button);
-//           convertView.setTag(holder);
-//        }
-//        else{
-//            holder = (ViewHolder) convertView.getTag();
-//        }
-//
-//        final Track currentTrack = trackList.get(position);
-//        holder.tv.setText(currentTrack.name);
-//        holder.btn.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v){
-//                SongListItem itemToAdd = new SongListItem(currentTrack.name);
-//                fragment.getListener().onAddToQueue(itemToAdd);
-//            }
-//        });
-//        return convertView;
-//    }
 }

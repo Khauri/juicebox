@@ -39,26 +39,60 @@ import retrofit.client.Response;
 
 public class UserUtils {
     private static  String TAG = "UserUtils";
-    private enum    EVENT_TYPES {UserUpdated, PlaylistUpdated};
+
+    public static void joinParty(JuiceboxParty party) {
+        setParty(party);
+        update("party", EVENT_TYPES.UserJoinedParty, party);
+    }
+
+    public static void getCurrTrack(DatabaseUtils.DatabaseCallback<JuiceboxTrack> cb) {
+        if(isInParty()){
+            DatabaseUtils.peekTrack(party, cb);
+        }
+    }
+
+    private enum    EVENT_TYPES {UserUpdated, EnterPartyZone, ExitPartyZone, UserPartyUpdated, UserJoinedParty, UserExitedParty, PlaylistUpdated};
 
     private static Location location;
     private static  JuiceboxUser user;
     private static  JuiceboxParty party;
+    private static JuiceboxPlaylist playlist;
     private static GeoQuery geoQuery;
 
     private UserUtils(){};
 
     public static void setLocation(Location location) {
+        UserUtils.location = location;
         if(geoQuery == null){
             geoQuery = DatabaseUtils.getGeoFire()
-                    .queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 0.001);
+                    .queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 0.01);
             geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
                 @Override
                 public void onKeyEntered(String key, GeoLocation location) {
+                    Log.d(TAG, "onKeyEntered: " + key);
+                    // Add key to nearby parties
+                    DatabaseUtils.getParty(key, new DatabaseUtils.DatabaseCallback<JuiceboxParty>() {
+                        @Override
+                        public void success(JuiceboxParty result) {
+                            update("party", EVENT_TYPES.EnterPartyZone, result);
+                        }
+                        @Override
+                        public void failure() {
+                        }
+                    });
                 }
                 @Override
                 public void onKeyExited(String key) {
-
+                    // remove from nearby parties
+                    DatabaseUtils.getParty(key, new DatabaseUtils.DatabaseCallback<JuiceboxParty>() {
+                        @Override
+                        public void success(JuiceboxParty result) {
+                            update("party", EVENT_TYPES.ExitPartyZone, result);
+                        }
+                        @Override
+                        public void failure() {
+                        }
+                    });
                 }
                 @Override
                 public void onKeyMoved(String key, GeoLocation location) {
@@ -72,7 +106,7 @@ public class UserUtils {
                 }
             });
         }else{
-            double radius = UserUtils.isInParty() ? party.radius / 1000 : 0.001;
+            double radius = UserUtils.isInParty() ? party.radius / 100 : 0.01;
             geoQuery.setLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), radius);
         }
     }
@@ -83,8 +117,6 @@ public class UserUtils {
         }
         return location;
     }
-
-    private static List<?> listeners2 = new ArrayList<>();
 
     public static boolean isHost() {
         if(user == null || party == null || TextUtils.isEmpty(user.id) || TextUtils.isEmpty(party.host_id))
@@ -108,12 +140,6 @@ public class UserUtils {
         }
     };
 
-    private static void onPlaylistUpdate(JuiceboxPlaylist juiceboxPlaylist) {
-        for(JuiceboxTrack track : juiceboxPlaylist.upcoming_tracks){
-            Log.d(TAG, "onPlaylistUpdate: " + track.track_name);
-        }
-    }
-
     private static ValueEventListener partyUpdateSubscriber = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -134,14 +160,17 @@ public class UserUtils {
         // notify watchers and shit
     }
 
+    public static void leaveParty(){
+        UserUtils.party = null;
+        update("party", EVENT_TYPES.UserExitedParty, null);
+    }
+
     public interface UserUtilsCallback{
         enum ERROR {NO_USER, SPOTIFY_ERROR, NOT_IN_PARTY, DATABASE_ERROR};
         void onSuccess();
         void onFailure(ERROR E, String error);
     }
 
-    public static void addTrackToCurrentParrt(Track track) {
-    }
 
     public static void createPartyWithTrack(Context context, Track track) {
         // Create a new intent
@@ -156,8 +185,12 @@ public class UserUtils {
             callback.onFailure(UserUtilsCallback.ERROR.NO_USER, "User was not initialized");
             return;
         }
-        Log.d(TAG, "hostParty: " + user.id);
         juiceboxParty.host_id = user.id;
+        Location l = getLocation();
+        if(l != null){
+            juiceboxParty.latitude = l.getLatitude();
+            juiceboxParty.longitude = l.getLongitude();
+        }
         // add the party to the database
         DatabaseUtils.createParty(juiceboxParty);
         setParty(juiceboxParty);
@@ -219,9 +252,10 @@ public class UserUtils {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         user = dataSnapshot.getValue(JuiceboxUser.class);
-                        for(DataSnapshot snapshot : dataSnapshot.getChildren())
-                            user.id = snapshot.getKey();
-                        update("user", EVENT_TYPES.UserUpdated, user);
+                        if(user != null) {
+                            user.id = dataSnapshot.getKey();
+                            update("user", EVENT_TYPES.UserUpdated, user);
+                        }
                     }
 
                     @Override
@@ -271,7 +305,30 @@ public class UserUtils {
 
     private static void update(String key, EVENT_TYPES type, Object o){
         for(DatabaseUpdateListener dul : eventListeners.get(key)){
-            dul.onUpdate(o);
+            switch(type){
+                case EnterPartyZone:
+                    if(dul instanceof PartyUpdateListener)
+                        ((PartyUpdateListener) dul).enterPartyZone((JuiceboxParty) o);
+                    break;
+                case ExitPartyZone:
+                    if(dul instanceof PartyUpdateListener)
+                        ((PartyUpdateListener) dul).exitPartyZone((JuiceboxParty) o);
+                    break;
+                case UserPartyUpdated:
+                    if(dul instanceof PartyUpdateListener)
+                        ((PartyUpdateListener) dul).userPartyUpdated((JuiceboxParty) o);
+                    break;
+                case UserJoinedParty:
+                    if(dul instanceof PartyUpdateListener)
+                        ((PartyUpdateListener) dul).userJoinedParty((JuiceboxParty) o);
+                    break;
+                case UserExitedParty:
+                    if(dul instanceof PartyUpdateListener)
+                        ((PartyUpdateListener) dul).userExitedParty();
+                    break;
+                default:
+                    dul.onUpdate(o);
+            }
         }
     }
     // I need a base class but
@@ -279,6 +336,15 @@ public class UserUtils {
     private interface DatabaseUpdateListener<T>{
         void onUpdate(T data);
     }
+
+    public interface PartyUpdateListener extends DatabaseUpdateListener<JuiceboxParty>{
+        void enterPartyZone(JuiceboxParty party);
+        void exitPartyZone(JuiceboxParty party);
+        void userPartyUpdated(JuiceboxParty party);
+        void userJoinedParty(JuiceboxParty o);
+        void userExitedParty();
+    };
+
     // Instead they have to use these pre-defined subclasses
     public interface PlaylistUpdateListener extends DatabaseUpdateListener<JuiceboxPlaylist>{}
 

@@ -1,4 +1,6 @@
 <resources>
+    <item name="visible" type="id"/>
+    <item name="masked" type="id"/>
     <string name="app_name">Juicebox</string>
     <string name="com_spotify_sdk_redirect_scheme">yourscheme</string>
     <string name="com_spotify_sdk_redirect_host">yourhost</string>

@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import edu.wm.cs420.juicebox.user.UserUtils;
 import kaaes.spotify.webapi.android.models.Pager;
 import kaaes.spotify.webapi.android.models.PlaylistSimple;
 import retrofit.Callback;
@@ -75,9 +76,7 @@ public class MainActivity
     private FusedLocationProviderClient mFusedLocationClient;
     private double longitude;
     private double latitude;
-    private LocationRequest mLocationRequest;
     private LocationRequest locationRequest;
-    private long lastUpdatedTime = 0;
 
     private static QueueFragment queueFragment;
     private static SearchFragment searchFragment;
@@ -132,18 +131,24 @@ public class MainActivity
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         requestPermissions();
         //getAlbum();
+        // TODO: Check for premium
+        SpotifyUtils.initializePlayer(this );
     }
     //public void requestPermissions (Activity activity, String[] permissions, int requestCode){
     public void requestPermissions () {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 ) {//Can add more as per requirement
-            //Toast.makeText(activity, "yes", Toast.LENGTH_SHORT).show();
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},
                     123);
 
         }else{
+            watchLocation();
+        }
+    }
+
+    private void watchLocation(){
         // Create the location request to start receiving updates
         locationRequest = new LocationRequest();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -158,21 +163,17 @@ public class MainActivity
         SettingsClient settingsClient = LocationServices.getSettingsClient(this);
         settingsClient.checkLocationSettings(locationSettingsRequest);
 
-        //if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-        //    return;
-        //}
-
         getLocationOnce();
-        getFusedLocationProviderClient(this).requestLocationUpdates(locationRequest, new LocationCallback() {
-                    @Override
-                    public void onLocationResult(LocationResult locationResult) {
-                        latitude = locationResult.getLastLocation().getLatitude();
-                        longitude = locationResult.getLastLocation().getLongitude();
-                        //Toast.makeText(MainActivity.this, "longitude is " + longitude + ", latitude is " + latitude, Toast.LENGTH_SHORT).show();
-                        onLocationChanged(locationResult.getLastLocation(), false);
-                    }
-                },
-                Looper.myLooper());}
+        try {
+            getFusedLocationProviderClient(this).requestLocationUpdates(locationRequest, new LocationCallback() {
+                        @Override
+                        public void onLocationResult(LocationResult locationResult) {
+                            onLocationChanged(locationResult.getLastLocation(), false);
+                        }
+                    }, Looper.myLooper());
+        }catch(SecurityException e){
+            Log.d(TAG, "watchLocation: no permissions given to watch location");
+        }
     }
 
     private void getLocationOnce() {
@@ -182,10 +183,7 @@ public class MainActivity
                 @Override
                 public void onLocationChanged(Location location) {
                     MainActivity.this.onLocationChanged(location, true);
-                    latitude = location.getLatitude();
-                    longitude = location.getLongitude();
-                    //Toast.makeText(MainActivity.this, "longitude is " + longitude + ", latitude is " + latitude, Toast.LENGTH_SHORT).show();
-
+                    UserUtils.setLocation(location);
                 }
 
                 @Override
@@ -204,11 +202,8 @@ public class MainActivity
     }
 
     public void onLocationChanged(Location location, boolean forceUpdate) {
-        long currentTime = System.currentTimeMillis();
-        if (forceUpdate || currentTime - lastUpdatedTime > 10000) {
-            //Log.d("TIMES", currentTime + " " + lastUpdatedTime + " " + (currentTime - lastUpdatedTime));
-            lastUpdatedTime = currentTime;
-        }
+        UserUtils.setLocation(location);
+        Log.d(TAG, "onLocationChanged: " + location.getLongitude());
     }
 
     @Override
@@ -362,11 +357,9 @@ public class MainActivity
             return NUM_ITEMS;
         }
     }
-
-    public double getLatitude(){
-        return latitude;
-    }
-    public double getLongitude(){
-        return longitude;
+    @Override
+    public void onBackPressed()
+    {
+        moveTaskToBack(true); // exist app
     }
 }

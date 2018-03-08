@@ -2,6 +2,7 @@ package edu.wm.cs420.juicebox;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.location.Location;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -166,15 +167,10 @@ public class NewPartyActivity extends AppCompatActivity {
 
     private void hostNewParty(){
         // TODO: Get the User's Last known location (doesn't have to be a string)
-        String latitude = Double.toString(mainActivity.getLatitude());
-        String longitude = Double.toString(mainActivity.getLongitude());
-        //String latLong = "37.269228,-76.712753"; // Roughly my room in williamsburg
-        String latLong = latitude+","+longitude;
         // create the party
         JuiceboxParty party = new JuiceboxParty();
         party.name = partyName;
         party.description = partyDesc;
-        party.location = latLong;
         party.radius = radius;
         party.playlist_id = DatabaseUtils.createPlaylist();
         // Create the party

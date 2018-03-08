@@ -34,7 +34,20 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:text="ToggleButton" />
+                android:text="ToggleButton"
+                android:textOff="PLAY"
+                android:textOn="PAUSE" />
+
+            <TextView
+                android:id="@+id/leave_party_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_weight="0"
+                android:text="Leave Party"
+                android:textAlignment="viewEnd"
+                android:textColor="@color/colorGrey"
+                android:textStyle="bold" />
         </FrameLayout>
 
         <SeekBar

@@ -36,9 +36,6 @@ import static com.spotify.sdk.android.authentication.AuthenticationResponse.Type
 
 public class EntryActivity extends AppCompatActivity
         implements ConnectionStateCallback {
-
-    private static final String CLIENT_ID = "6098304025324b66af007d562d58830e";
-
     private static final String REDIRECT_URI = "juicebox.redirect.uri://callback/";
     private static final String TAG = "Juicebox-EntryActivity";
 
@@ -73,78 +70,16 @@ public class EntryActivity extends AppCompatActivity
         });
     }
 
-    //public void requestPermissions (Activity activity, String[] permissions, int requestCode){
-    public void requestPermissions (){
-//        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-//                ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-//                ){//Can add more as per requirement
-//            //Toast.makeText(activity, "yes", Toast.LENGTH_SHORT).show();
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},
-//                    123);
-//
-//        }
-//        else{
-//            mLocationRequest = LocationRequest.create()
-//                            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-//                            .setInterval(10000);
-//        Toast.makeText(EntryActivity.this, "no", Toast.LENGTH_SHORT).show();}
-//        ActivityCompat.requestPermissions(this,
-//                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION},
-//                123);
-    }
     @Override
     public void onRequestPermissionsResult (int requestCode, String[] permissions, int[] grantResults){
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        //Toast.makeText(EntryActivity.this, "got here" , Toast.LENGTH_SHORT).show();
-        Log.d(TAG, "onRequestPermissionsResult");
-//        switch (requestCode) {
-//            case 123:
-//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    //granted
-//                    Toast.makeText(this, "permission granted", Toast.LENGTH_SHORT).show();
-//                    Log.d("tag3","permission granted");
-//                    try{
-//                    mLocationRequest = LocationRequest.create()
-//                            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-//                            .setInterval(0);
-//                    mFusedLocationClient.getLastLocation()
-//                            .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-//                                @Override
-//                                public void onSuccess(Location location) {
-//                                    Log.d("check","got here4");
-//                                    // Got last known location. In some rare situations this can be null.
-//                                    if (location != null) {
-//                                        latitude = location.getLatitude();
-//                                        longitude = location.getLongitude();
-//                                        Toast.makeText(EntryActivity.this, "latitude is" + latitude + ", longitude is" + longitude, Toast.LENGTH_SHORT).show();
-//                                        Log.d("location", "latitude is" + latitude + ", longitude is" + longitude);
-//                                    }
-//                                }
-//                            });
-//                    }catch (SecurityException e) {
-//
-//                    } catch (Exception e) {
-//
-//                    }
-//
-//                } else {
-//                    //not granted
-//                    Toast.makeText(this, "permission not granted", Toast.LENGTH_SHORT).show();
-//                    Log.d("tag4","permission not granted");
-//                }
-//                break;
-//            default:
-//                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        }
-
     }
 
 
     private void initiateLoginScreen(){
         // Authentifications
         AuthenticationRequest.Builder builder;
-        builder = new AuthenticationRequest.Builder(CLIENT_ID, TOKEN, REDIRECT_URI);
+        builder = new AuthenticationRequest.Builder(SpotifyUtils.getClientId(), TOKEN, REDIRECT_URI);
         builder.setScopes(new String[]{"user-read-private", "user-library-read", "user-top-read",
                 "playlist-read-private", "user-read-recently-played", "streaming"});
         AuthenticationRequest request = builder.build();
@@ -177,12 +112,12 @@ public class EntryActivity extends AppCompatActivity
                 default:
                     Log.d("OnActivityResult", "Fallen to default case");
             }
-
         }
     }
 
     private void openMainActivity(){
         Intent nextActivity = new Intent(getBaseContext(), MainActivity.class);
+        nextActivity.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         //give the access token to the next activity so that we can make API calls
         nextActivity.putExtra("token", accessToken);
         startActivity(nextActivity);

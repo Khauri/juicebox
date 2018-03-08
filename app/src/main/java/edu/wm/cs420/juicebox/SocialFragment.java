@@ -1,6 +1,7 @@
 package edu.wm.cs420.juicebox;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -45,6 +46,7 @@ public class SocialFragment extends Fragment implements UserUtils.UserUpdateList
     private TextView app_user_name;
     private ImageView profile_pic;
     private TextView reputation_num;
+    private View view_on_spotify_btn;
 
     public SocialFragment() {
         // Required empty public constructor
@@ -96,6 +98,20 @@ public class SocialFragment extends Fragment implements UserUtils.UserUpdateList
         app_user_name = getView().findViewById(R.id.app_user_name);
         profile_pic = getView().findViewById(R.id.appbar_profile_pic);
         reputation_num = getView().findViewById(R.id.app_user_reputation);
+        view_on_spotify_btn = getView().findViewById(R.id.view_on_spotify_button);
+        // Open spotify user profile on click
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                JuiceboxUser user = UserUtils.getUser();
+                if(user != null){
+                    String spotifyUri = "spotify:user:"+UserUtils.getUser().id;
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(spotifyUri));
+                    startActivity(intent);
+                }
+
+            }
+        });
         // When the view gets recreated we'll just manually call this method
         onUpdate(UserUtils.getUser());
     }
